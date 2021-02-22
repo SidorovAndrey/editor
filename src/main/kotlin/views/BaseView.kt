@@ -2,7 +2,7 @@ package views
 
 import ViewRepository
 
-open class BaseView(viewRepository: ViewRepository) {
+abstract class BaseView(viewRepository: ViewRepository) {
     init {
         // want to have virtual this access here
         @Suppress("LeakingThis")

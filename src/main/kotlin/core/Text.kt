@@ -79,7 +79,7 @@ class Text(textBuffer: BufferedReader) {
             throw IllegalArgumentException("Indexes should represent positions of line in text, values start=${start}; end=${end} are incorrect")
 
         var current = head;
-        var idx = 1;
+        var idx = 1
         val list = mutableListOf<String>()
         while (idx < start) {
             if (current.next == null)
