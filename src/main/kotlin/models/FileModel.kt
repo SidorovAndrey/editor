@@ -5,23 +5,23 @@ import java.io.File
 
 class FileModel {
     private var file: File? = null
-    private val onFileSet: Event<FileSetCallback> = Event()
+    private val onFileSetEvent: Event<FileSetCallback> = Event()
 
     fun interface FileSetCallback {
         fun onSet(file: File)
     }
 
     fun onFileSet(who: Any, callback: FileSetCallback) {
-        this.onFileSet.subscribe(who, callback)
+        this.onFileSetEvent.subscribe(who, callback)
     }
 
     fun unsubscribeOnFileSet(who: Any) {
-        this.onFileSet.unsubscribe(who)
+        this.onFileSetEvent.unsubscribe(who)
     }
 
     fun setFile(file: File) {
         this.file = file
-        for (c in this.onFileSet.getSubscribers()) {
+        for (c: FileSetCallback in this.onFileSetEvent.getSubscribers()) {
             c.onSet(file)
         }
     }

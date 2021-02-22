@@ -9,15 +9,14 @@ import javax.swing.*
 
 class MenuView (
     viewRepository: ViewRepository,
-    private val frame: JFrame) : BaseView(viewRepository) {
+    private val frame: JFrame
+) : BaseView(viewRepository) {
 
     private val menuBar = JMenuBar()
     private var selectedFile: File? = null
-    private val onFileSet: Event<FileSetCallback> = Event()
+    private val onFileSetEvent: Event<FileSetCallback> = Event()
 
     init {
-        viewRepository[MenuView::class] = this
-
         val fileMenu = JMenu("File")
 
         val openMenuItem = JMenuItem("Open")
@@ -37,11 +36,11 @@ class MenuView (
     }
 
     fun onFileSet(who: Any, callback: FileSetCallback) {
-        this.onFileSet.subscribe(who, callback)
+        this.onFileSetEvent.subscribe(who, callback)
     }
 
     fun unsubscribeOnFileSet(who: Any) {
-        this.onFileSet.unsubscribe(who)
+        this.onFileSetEvent.unsubscribe(who)
     }
 
     fun interface FileSetCallback {
@@ -67,7 +66,7 @@ class MenuView (
 
     private fun setFile(file: File) {
         this.selectedFile = file
-        for (c in this.onFileSet.getSubscribers()) {
+        for (c in this.onFileSetEvent.getSubscribers()) {
             c.onSet(file)
         }
     }
