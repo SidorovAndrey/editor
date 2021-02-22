@@ -21,4 +21,8 @@ class TextModel {
     fun loadText(bufferedReader: BufferedReader) {
         text = Text(bufferedReader)
     }
+
+    fun resize(size: Int) {
+        lastRow = firstRow + size
+    }
 }
