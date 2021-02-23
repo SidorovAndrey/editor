@@ -2,6 +2,7 @@ package views
 
 import ViewRepository
 import events.Event
+import events.EventProducer
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.io.File
@@ -10,7 +11,7 @@ import javax.swing.*
 class MenuView (
     viewRepository: ViewRepository,
     private val frame: JFrame
-) : BaseView(viewRepository) {
+) : BaseView(viewRepository), EventProducer<MenuView.FileSetCallback> {
 
     private val menuBar = JMenuBar()
     private var selectedFile: File? = null
@@ -35,11 +36,11 @@ class MenuView (
         frame.jMenuBar = menuBar
     }
 
-    fun onFileSet(who: Any, callback: FileSetCallback) {
+    override fun subscribe(who: Any, callback: FileSetCallback) {
         this.onFileSetEvent.subscribe(who, callback)
     }
 
-    fun unsubscribeOnFileSet(who: Any) {
+    override fun <FileSetCallback> unsubscribe(who: Any) {
         this.onFileSetEvent.unsubscribe(who)
     }
 

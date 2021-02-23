@@ -11,8 +11,8 @@ class TextFieldController(
     private val textFieldView: TextFieldView) {
 
     init {
-        fileModel.onFileSet(this) { file -> this.onFileSet(file) }
-        textFieldView.onResized(this) { value -> this.onResized(value) }
+        fileModel.subscribe(this) { file -> this.onFileSet(file) }
+        textFieldView.subscribe(this) { value -> this.onResized(value) }
     }
 
     private fun onFileSet(file: File) {

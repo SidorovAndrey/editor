@@ -1,9 +1,10 @@
 package models
 
 import events.Event
+import events.EventProducer
 import java.io.File
 
-class FileModel {
+class FileModel : EventProducer<FileModel.FileSetCallback> {
     private var file: File? = null
     private val onFileSetEvent: Event<FileSetCallback> = Event()
 
@@ -11,11 +12,11 @@ class FileModel {
         fun onSet(file: File)
     }
 
-    fun onFileSet(who: Any, callback: FileSetCallback) {
+    override fun subscribe(who: Any, callback: FileSetCallback) {
         this.onFileSetEvent.subscribe(who, callback)
     }
 
-    fun unsubscribeOnFileSet(who: Any) {
+    override fun <FileSetCallback> unsubscribe(who: Any) {
         this.onFileSetEvent.unsubscribe(who)
     }
 

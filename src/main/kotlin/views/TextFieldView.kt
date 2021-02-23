@@ -3,6 +3,7 @@ package views
 import ViewRepository
 import components.TextField
 import events.Event
+import events.EventProducer
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import javax.swing.JFrame
@@ -10,14 +11,14 @@ import javax.swing.JFrame
 class TextFieldView(
     viewRepository: ViewRepository,
     frame : JFrame
-) : BaseView(viewRepository) {
+) : BaseView(viewRepository), EventProducer<TextFieldView.OnResizedCallback> {
 
     private val textField = TextField()
-    var currentHeight: Int = textField.height
-        private set
-
     private var text: List<String> = mutableListOf()
     private val onHeightChangedEvent: Event<OnResizedCallback> = Event()
+
+    var currentHeight: Int = textField.height
+        private set
 
     init {
         frame.add(textField)
@@ -38,11 +39,11 @@ class TextFieldView(
         fun set(height: Int)
     }
 
-    fun onResized(who: Any, callback: OnResizedCallback) {
+    override fun subscribe(who: Any, callback: OnResizedCallback) {
         onHeightChangedEvent.subscribe(who, callback);
     }
 
-    fun unsubscribeOnResized(who: Any) {
+    override fun <OnResizedCallback> unsubscribe(who: Any) {
         onHeightChangedEvent.unsubscribe(who);
     }
 

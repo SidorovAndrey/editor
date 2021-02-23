@@ -7,7 +7,7 @@ import javax.swing.JComponent
 class TextField : JComponent() {
     private var text: List<String> = mutableListOf()
 
-    val lineHeight = 18 // fontSize + gap that gonna be in config later
+    val lineHeight = Configuration.fontSize + Configuration.linesGap
 
     fun setText(text: List<String>) {
         this.text = text
@@ -20,14 +20,13 @@ class TextField : JComponent() {
         g.fillRect(2, 2, this.width - 4, this.height - 4)
         g.color = Color.BLACK
 
-        val fontSize = 15 // TODO: move to config
+        val fontSize = Configuration.fontSize
         g.font = g.font.deriveFont(fontSize.toFloat())
 
-        val gap = 3
-        var current = 14
+        var current = fontSize
         for (line in text) {
             g.drawString(line, 14, current)
-            current += gap + fontSize
+            current += lineHeight
         }
     }
 }
