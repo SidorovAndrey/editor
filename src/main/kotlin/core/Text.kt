@@ -7,17 +7,26 @@ class Text(textBuffer: BufferedReader) {
     private var head: TextLine
     private var currentLine: TextLine
 
+    var lineNumber: Int
+        private set
+
+    var totalLines: Int
+        private set
+
     val currentLineText: String
         get() = currentLine.text
 
     init {
         head = TextLine(textBuffer.readLine() ?: "")
         currentLine = head
+        lineNumber = 1
+        totalLines = 1
 
         var current: TextLine = head
         for (line in textBuffer.lineSequence()) {
             current.next = TextLine(line, prev = current)
             current = current.next!!
+            totalLines++
         }
     }
 
@@ -36,6 +45,7 @@ class Text(textBuffer: BufferedReader) {
                     return updateCurrentLine(current)
 
                 current = current.next!!
+                lineNumber++
             }
         } else {
             for (i in range) {
@@ -43,6 +53,7 @@ class Text(textBuffer: BufferedReader) {
                     return updateCurrentLine(current)
 
                 current = current.prev!!
+                lineNumber--
             }
         }
 
@@ -57,6 +68,7 @@ class Text(textBuffer: BufferedReader) {
         val created = current.next!!
         created.prev = current
         created.next = next
+        totalLines++
 
         return updateCurrentLine(created)
     }
@@ -71,6 +83,7 @@ class Text(textBuffer: BufferedReader) {
         }
 
         prev.next = current.next
+        totalLines--
         return updateCurrentLine(prev)
     }
 

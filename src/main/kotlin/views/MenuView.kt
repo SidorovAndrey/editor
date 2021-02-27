@@ -23,13 +23,10 @@ class MenuView (
         val openMenuItem = JMenuItem("Open")
         fileMenu.add(openMenuItem)
 
-        val reopenMenuItem = JMenuItem("Reopen")
-        fileMenu.add(reopenMenuItem)
-
         val saveMenuItem = JMenuItem("Save")
         fileMenu.add(saveMenuItem)
 
-        val eventListener = MenuEventListener(openMenuItem, reopenMenuItem, saveMenuItem)
+        val eventListener = MenuEventListener(openMenuItem, saveMenuItem)
         openMenuItem.addActionListener(eventListener)
 
         menuBar.add(fileMenu)
@@ -50,7 +47,6 @@ class MenuView (
 
     inner class MenuEventListener(
         private val openMenuItem: JMenuItem,
-        private val reopenMenuItem: JMenuItem,
         private val saveMenuItem: JMenuItem) : ActionListener {
 
         override fun actionPerformed(p0: ActionEvent?) {

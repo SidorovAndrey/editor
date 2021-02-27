@@ -5,8 +5,11 @@ import models.TextModel
 import views.EditorView
 import views.MenuView
 import views.TextFieldView
+import java.io.File
 
 fun main() {
+    Configuration.load(File("config.properties").inputStream())
+
     val fileModel = FileModel()
     val textModel = TextModel()
 
