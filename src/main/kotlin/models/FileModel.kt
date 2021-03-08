@@ -16,7 +16,7 @@ class FileModel : EventProducer<FileModel.FileSetCallback> {
         this.onFileSetEvent.subscribe(who, callback)
     }
 
-    override fun <FileSetCallback> unsubscribe(who: Any) {
+    override fun unsubscribe(who: Any) {
         this.onFileSetEvent.unsubscribe(who)
     }
 

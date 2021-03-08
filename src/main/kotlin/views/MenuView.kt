@@ -37,7 +37,7 @@ class MenuView (
         this.onFileSetEvent.subscribe(who, callback)
     }
 
-    override fun <FileSetCallback> unsubscribe(who: Any) {
+    override fun unsubscribe(who: Any) {
         this.onFileSetEvent.unsubscribe(who)
     }
 
@@ -51,7 +51,7 @@ class MenuView (
 
         override fun actionPerformed(p0: ActionEvent?) {
             if (p0?.source == openMenuItem) {
-                val fileChooser = JFileChooser();
+                val fileChooser = JFileChooser()
                 fileChooser.currentDirectory = File(System.getProperty("user.home"))
                 val result = fileChooser.showOpenDialog(frame)
                 if (result == JFileChooser.APPROVE_OPTION) {

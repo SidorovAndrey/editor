@@ -13,8 +13,21 @@ class Text(textBuffer: BufferedReader) {
     var totalLines: Int
         private set
 
-    val currentLineText: String
+    var currentLineText: String
         get() = currentLine.text
+        set(value) {
+            val prev = currentLine.prev
+            val next = currentLine.next
+            val newLine = TextLine(value)
+            if (prev != null) {
+                newLine.prev = prev
+                prev.next = newLine
+            }
+            if (next != null) {
+                newLine.next = next
+                next.prev = newLine
+            }
+        }
 
     init {
         head = TextLine(textBuffer.readLine() ?: "")
@@ -87,7 +100,7 @@ class Text(textBuffer: BufferedReader) {
         return updateCurrentLine(prev)
     }
 
-    fun getRange(start: Int, end: Int): List<String> {
+    fun getRange(start: Int, end: Int): MutableList<String> {
         if (start < 1 || end < 1 || start > end)
             throw IllegalArgumentException("Indexes should represent positions of line in text, values start=${start}; end=${end} are incorrect")
 
@@ -112,5 +125,28 @@ class Text(textBuffer: BufferedReader) {
         }
 
         return list
+    }
+
+    fun addText(text: String, pos: Int) {
+        val line = currentLine
+        val builder = StringBuilder(line.text)
+        builder.insert(pos, text)
+
+        val newLine = TextLine(builder.toString())
+        val prev = line.prev
+        val next = line.next
+        if (prev != null) {
+            prev.next = newLine
+            newLine.prev = prev
+        } else {
+            head = newLine
+        }
+
+        if (next != null) {
+            next.prev = newLine
+            newLine.next = next
+        }
+
+        currentLine = newLine
     }
 }

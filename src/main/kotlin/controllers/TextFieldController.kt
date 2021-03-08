@@ -13,7 +13,8 @@ class TextFieldController(
     init {
         fileModel.subscribe(this) { file -> this.onFileSet(file) }
         textFieldView.asOnResizedEventProducer().subscribe(this) { value -> this.onResized(value) }
-        textFieldView.asOnKeyPressEventProducer().subscribe(this) { key, ch -> this.onKeyPress(key, ch) }
+        textFieldView.asOnControlKeyPressEventProducer().subscribe(this) { key, ch -> this.onKeyPress(key, ch) }
+        textFieldView.asOnTextChangedEventProducer().subscribe(this) { str -> this.onTextChanged(str) }
     }
 
     private fun onFileSet(file: File) {
@@ -38,6 +39,11 @@ class TextFieldController(
             TextFieldView.KeyTypes.PAGE_DOWN -> this.textModel.moveCursorToLastLine()
         }
 
+        this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
+    }
+
+    private fun onTextChanged(str: String) {
+        this.textModel.addText(str)
         this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
     }
 }

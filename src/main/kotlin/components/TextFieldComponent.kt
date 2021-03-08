@@ -6,7 +6,7 @@ import java.awt.Graphics
 import javax.swing.JComponent
 
 class TextFieldComponent : JComponent() {
-    private var text: List<String> = mutableListOf()
+    private var text: MutableList<String> = mutableListOf()
     private var row: Int = 1
     private var column: Int = 0
 
@@ -16,10 +16,21 @@ class TextFieldComponent : JComponent() {
 
     val lineHeight = Configuration.fontSize + Configuration.linesGap
 
-    fun setText(text: List<String>, row: Int, column: Int) {
+    fun setText(text: MutableList<String>, row: Int, column: Int) {
         this.text = text
         this.row = row
         this.column = column
+        revalidate()
+        repaint()
+        requestFocus()
+    }
+
+    fun addChar(ch: Char) {
+        // TODO: fix bug when typing TO FAST
+        val builder = StringBuilder(this.text[row - 1])
+        builder.insert(column, ch)
+        this.text[row - 1] = builder.toString()
+        this.column++
         revalidate()
         repaint()
         requestFocus()

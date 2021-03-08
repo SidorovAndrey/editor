@@ -2,20 +2,12 @@ package models
 
 import core.Text
 import java.io.BufferedReader
-import java.io.StringReader
 
-class TextModel {
-    private var text: Text
+class TextModel(private var text: Text) {
     private var firstRow = 1
     private var lastRow = 1
 
-    init {
-        val reader = StringReader("")
-        val bufferedReader = BufferedReader(reader)
-        text = Text(bufferedReader)
-    }
-
-    val currentText: List<String>
+    val currentText: MutableList<String>
         get() = text.getRange(firstRow, lastRow)
 
     var cursorColumn: Int = 0
@@ -69,5 +61,10 @@ class TextModel {
 
     fun moveCursorToLineEnd() {
         cursorColumn = text.currentLineText.length
+    }
+
+    fun addText(string: String) {
+        text.addText(string, cursorColumn)
+        cursorColumn += string.length
     }
 }
