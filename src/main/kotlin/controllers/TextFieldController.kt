@@ -37,6 +37,8 @@ class TextFieldController(
             TextFieldView.KeyTypes.END -> this.textModel.moveCursorToLineEnd()
             TextFieldView.KeyTypes.PAGE_UP -> this.textModel.moveCursorToFirstLine()
             TextFieldView.KeyTypes.PAGE_DOWN -> this.textModel.moveCursorToLastLine()
+            TextFieldView.KeyTypes.BACK_SPACE -> this.textModel.deletePrevious()
+            TextFieldView.KeyTypes.DELETE -> this.textModel.deleteNext()
         }
 
         this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)

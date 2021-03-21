@@ -67,4 +67,14 @@ class TextModel(private var text: Text) {
         text.addText(string, cursorColumn)
         cursorColumn += string.length
     }
+
+    fun deletePrevious() {
+        // TODO: handle cursorColumn == 0 situation
+        text.deleteText(cursorColumn, -1)
+        cursorColumn--
+    }
+
+    fun deleteNext() {
+        text.deleteText(cursorColumn, 1)
+    }
 }

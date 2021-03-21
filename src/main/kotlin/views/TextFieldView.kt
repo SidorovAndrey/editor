@@ -41,7 +41,7 @@ class TextFieldView(
 
         textField.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent) {
-                if (e.keyChar.isLetterOrDigit() || e.keyChar.isWhitespace()) {
+                if (isSymbol(e.keyChar)) {
                     handleChar(e.keyChar)
                 } else {
                     val key = when (e.keyCode) {
@@ -53,6 +53,8 @@ class TextFieldView(
                         KeyEvent.VK_END -> KeyTypes.END
                         KeyEvent.VK_PAGE_UP -> KeyTypes.PAGE_UP
                         KeyEvent.VK_PAGE_DOWN -> KeyTypes.PAGE_DOWN
+                        KeyEvent.VK_BACK_SPACE -> KeyTypes.BACK_SPACE
+                        KeyEvent.VK_DELETE -> KeyTypes.DELETE
                         else -> KeyTypes.NONE
                     }
 
@@ -64,6 +66,10 @@ class TextFieldView(
         })
     }
 
+    private fun isSymbol(ch: Char): Boolean {
+        return ch.toInt() in 32..126
+    }
+
     enum class KeyTypes {
         NONE,
         UP,
@@ -73,7 +79,9 @@ class TextFieldView(
         HOME,
         END,
         PAGE_UP,
-        PAGE_DOWN
+        PAGE_DOWN,
+        BACK_SPACE,
+        DELETE
     }
 
     fun interface OnControlKeyPressed {

@@ -128,13 +128,32 @@ class Text(textBuffer: BufferedReader) {
     }
 
     fun addText(text: String, pos: Int) {
-        val line = currentLine
-        val builder = StringBuilder(line.text)
+        val currentLine = currentLine
+        val builder = StringBuilder(currentLine.text)
         builder.insert(pos, text)
 
         val newLine = TextLine(builder.toString())
-        val prev = line.prev
-        val next = line.next
+        replaceLine(currentLine, newLine)
+    }
+
+    fun deleteText(pos: Int, elements: Int) {
+        val currentLine = currentLine
+        val builder = StringBuilder(currentLine.text)
+
+        // TODO: use exceptions? handle rows here?
+        if (elements < 0 && pos + elements >= 0) {
+            builder.deleteRange(pos + elements, pos)
+        } else if (elements > 0 && pos + elements < currentLineText.length) {
+            builder.deleteRange(pos, pos + elements)
+        }
+
+        val newLine = TextLine(builder.toString())
+        replaceLine(currentLine, newLine)
+    }
+
+    private fun replaceLine(current: TextLine, newLine: TextLine) {
+        val prev = current.prev
+        val next = current.next
         if (prev != null) {
             prev.next = newLine
             newLine.prev = prev
@@ -147,6 +166,6 @@ class Text(textBuffer: BufferedReader) {
             newLine.next = next
         }
 
-        currentLine = newLine
+        this.currentLine = newLine
     }
 }

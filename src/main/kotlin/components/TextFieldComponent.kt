@@ -26,14 +26,11 @@ class TextFieldComponent : JComponent() {
     }
 
     fun addChar(ch: Char) {
-        // TODO: fix bug when typing TO FAST
         val builder = StringBuilder(this.text[row - 1])
         builder.insert(column, ch)
         this.text[row - 1] = builder.toString()
         this.column++
-        revalidate()
         repaint()
-        requestFocus()
     }
 
     override fun paintComponent(g: Graphics?) {
