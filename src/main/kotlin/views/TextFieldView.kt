@@ -55,6 +55,7 @@ class TextFieldView(
                         KeyEvent.VK_PAGE_DOWN -> KeyTypes.PAGE_DOWN
                         KeyEvent.VK_BACK_SPACE -> KeyTypes.BACK_SPACE
                         KeyEvent.VK_DELETE -> KeyTypes.DELETE
+                        KeyEvent.VK_ENTER -> KeyTypes.ENTER
                         else -> KeyTypes.NONE
                     }
 
@@ -81,7 +82,8 @@ class TextFieldView(
         PAGE_UP,
         PAGE_DOWN,
         BACK_SPACE,
-        DELETE
+        DELETE,
+        ENTER
     }
 
     fun interface OnControlKeyPressed {

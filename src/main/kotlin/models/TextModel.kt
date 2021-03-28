@@ -26,10 +26,14 @@ class TextModel(private var text: Text) {
 
     fun moveCursorUp() {
         text.move(-1)
+        if (text.currentLineText.length < cursorColumn)
+            cursorColumn = text.currentLineText.length
     }
 
     fun moveCursorDown() {
         text.move(1)
+        if (text.currentLineText.length < cursorColumn)
+            cursorColumn = text.currentLineText.length
     }
 
     fun moveCursorRight() {
@@ -69,12 +73,22 @@ class TextModel(private var text: Text) {
     }
 
     fun deletePrevious() {
-        // TODO: handle cursorColumn == 0 situation
-        text.deleteText(cursorColumn, -1)
-        cursorColumn--
+        if (cursorColumn == 0) {
+            cursorColumn = text.mergeCurrentLineWithPrevious()
+        } else {
+            text.deleteText(cursorColumn, -1)
+            cursorColumn--
+        }
     }
 
     fun deleteNext() {
         text.deleteText(cursorColumn, 1)
+    }
+
+    fun addNewLine() {
+        val newLineText = text.currentLineText.substring(cursorColumn)
+        text.deleteText(cursorColumn, newLineText.length)
+        text.addLine(newLineText)
+        cursorColumn = 0
     }
 }

@@ -73,15 +73,16 @@ class Text(textBuffer: BufferedReader) {
         return updateCurrentLine(current)
     }
 
-    fun addLine(): String {
+    fun addLine(text: String): String {
         val current = currentLine
         val next = current.next
-        current.next = TextLine("")
+        current.next = TextLine(text)
 
         val created = current.next!!
         created.prev = current
         created.next = next
         totalLines++
+        lineNumber++
 
         return updateCurrentLine(created)
     }
@@ -143,12 +144,27 @@ class Text(textBuffer: BufferedReader) {
         // TODO: use exceptions? handle rows here?
         if (elements < 0 && pos + elements >= 0) {
             builder.deleteRange(pos + elements, pos)
-        } else if (elements > 0 && pos + elements < currentLineText.length) {
+        } else if (elements > 0 && pos + elements <= currentLineText.length) {
             builder.deleteRange(pos, pos + elements)
         }
 
         val newLine = TextLine(builder.toString())
         replaceLine(currentLine, newLine)
+    }
+
+    /**
+     * Merges current line with previous. Returns position where text was merged
+     */
+    fun mergeCurrentLineWithPrevious(): Int {
+        if (lineNumber == 1) return 0
+
+        val restText = currentLineText
+        removeLine()
+        val mergePosition = currentLineText.length
+        addText(restText, currentLineText.length)
+        lineNumber--
+
+        return mergePosition
     }
 
     private fun replaceLine(current: TextLine, newLine: TextLine) {
