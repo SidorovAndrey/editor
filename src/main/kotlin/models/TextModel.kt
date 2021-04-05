@@ -16,6 +16,21 @@ class TextModel(private var text: Text) {
     val cursorRow: Int
         get() = text.lineNumber
 
+    var isSelecting: Boolean = false
+        private set
+
+    var selectStartRow: Int = 0
+        private set
+
+    var selectStartColumn: Int = 0
+        private set
+
+    var selectEndRow: Int = 0
+        private set
+
+    var selectEndColumn: Int = 0
+        private set
+
     fun loadText(bufferedReader: BufferedReader) {
         text = Text(bufferedReader)
     }
@@ -90,5 +105,42 @@ class TextModel(private var text: Text) {
         text.deleteText(cursorColumn, newLineText.length)
         text.addLine(newLineText)
         cursorColumn = 0
+    }
+
+    fun startSelect() {
+        isSelecting = true
+        selectStartRow = cursorRow
+        selectEndRow = cursorRow
+        selectStartColumn = cursorColumn
+        selectEndColumn = cursorColumn
+    }
+
+    fun stopSelect() {
+        isSelecting = false
+    }
+
+    fun moveSelectColumn(offset: Int) {
+        if (cursorColumn + offset < 0 || cursorColumn + offset > currentText[cursorRow].length)
+            return
+
+        cursorColumn += offset
+        if (cursorColumn > selectStartColumn)
+            selectEndColumn = cursorColumn
+        else
+            selectStartColumn = cursorColumn
+    }
+
+    fun moveSelectRow(offset: Int) {
+        text.move(offset)
+
+        if (cursorRow > selectEndRow)
+            selectEndRow = cursorRow
+        else if (cursorRow >= selectStartRow)
+            if (offset > 0)
+                selectStartRow = cursorRow
+            else
+                selectEndRow = cursorRow
+        else
+            selectStartRow = cursorRow
     }
 }

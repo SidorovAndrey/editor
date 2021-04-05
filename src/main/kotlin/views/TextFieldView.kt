@@ -6,9 +6,7 @@ import events.Event
 import events.EventProducer
 import utils.InputTimer
 import java.awt.event.*
-import java.util.*
 import javax.swing.JFrame
-import kotlin.concurrent.schedule
 
 class TextFieldView(
     viewRepository: ViewRepository,
@@ -49,10 +47,12 @@ class TextFieldView(
                         KeyEvent.VK_DOWN -> KeyTypes.DOWN
                         KeyEvent.VK_LEFT -> KeyTypes.LEFT
                         KeyEvent.VK_RIGHT -> KeyTypes.RIGHT
+
                         KeyEvent.VK_HOME -> KeyTypes.HOME
                         KeyEvent.VK_END -> KeyTypes.END
                         KeyEvent.VK_PAGE_UP -> KeyTypes.PAGE_UP
                         KeyEvent.VK_PAGE_DOWN -> KeyTypes.PAGE_DOWN
+
                         KeyEvent.VK_BACK_SPACE -> KeyTypes.BACK_SPACE
                         KeyEvent.VK_DELETE -> KeyTypes.DELETE
                         KeyEvent.VK_ENTER -> KeyTypes.ENTER
@@ -60,7 +60,7 @@ class TextFieldView(
                     }
 
                     for (s in onControlKeyPressedEvent.getSubscribers()) {
-                        s.handle(key, e.keyChar)
+                        s.handle(key, e.isShiftDown)
                     }
                 }
             }
@@ -87,7 +87,7 @@ class TextFieldView(
     }
 
     fun interface OnControlKeyPressed {
-        fun handle(key: KeyTypes, char: Char)
+        fun handle(key: KeyTypes, isShiftPressed: Boolean)
     }
 
     fun asOnControlKeyPressEventProducer(): EventProducer<OnControlKeyPressed> {
@@ -149,5 +149,9 @@ class TextFieldView(
 
         inputTimer!!.add(ch)
         textField.addChar(ch)
+    }
+
+    fun setSelect(startRow: Int, startColumn: Int, endRow: Int, endColumn: Int) {
+        textField.setSelect(startRow, startColumn, endRow, endColumn)
     }
 }
