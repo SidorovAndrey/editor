@@ -13,7 +13,7 @@ class TextFieldController(
     init {
         fileModel.subscribe(this) { file -> this.onFileSet(file) }
         textFieldView.asOnResizedEventProducer().subscribe(this) { value -> this.onResized(value) }
-        textFieldView.asOnControlKeyPressEventProducer().subscribe(this) { key, isShiftPressed -> this.onKeyPress(key, isShiftPressed) }
+        textFieldView.asOnControlKeyPressEventProducer().subscribe(this) { key, isShiftPressed, isControlPressed -> this.onKeyPress(key, isShiftPressed, isControlPressed) }
         textFieldView.asOnTextChangedEventProducer().subscribe(this) { str -> this.onTextChanged(str) }
     }
 
@@ -27,8 +27,12 @@ class TextFieldController(
         this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
     }
 
-    private fun onKeyPress(key: TextFieldView.KeyTypes, isShiftPressed: Boolean) {
-        if (isShiftPressed) {
+    private fun onKeyPress(key: TextFieldView.KeyTypes, isShiftPressed: Boolean, isControlPressed: Boolean) {
+        if (isControlPressed) {
+            when (key) {
+                TextFieldView.KeyTypes.C -> this.textModel.copySelected()
+            }
+        } else if (isShiftPressed) {
             if (!this.textModel.isSelecting)
                 this.textModel.startSelect()
 

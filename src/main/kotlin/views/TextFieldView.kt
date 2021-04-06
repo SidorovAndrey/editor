@@ -56,11 +56,15 @@ class TextFieldView(
                         KeyEvent.VK_BACK_SPACE -> KeyTypes.BACK_SPACE
                         KeyEvent.VK_DELETE -> KeyTypes.DELETE
                         KeyEvent.VK_ENTER -> KeyTypes.ENTER
+
+                        KeyEvent.VK_C -> KeyTypes.C
+                        KeyEvent.VK_V -> KeyTypes.V
+                        KeyEvent.VK_X -> KeyTypes.X
                         else -> KeyTypes.NONE
                     }
 
                     for (s in onControlKeyPressedEvent.getSubscribers()) {
-                        s.handle(key, e.isShiftDown)
+                        s.handle(key, e.isShiftDown, e.isControlDown)
                     }
                 }
             }
@@ -83,11 +87,14 @@ class TextFieldView(
         PAGE_DOWN,
         BACK_SPACE,
         DELETE,
-        ENTER
+        ENTER,
+        C,
+        V,
+        X
     }
 
     fun interface OnControlKeyPressed {
-        fun handle(key: KeyTypes, isShiftPressed: Boolean)
+        fun handle(key: KeyTypes, isShiftPressed: Boolean, isControlDown: Boolean)
     }
 
     fun asOnControlKeyPressEventProducer(): EventProducer<OnControlKeyPressed> {

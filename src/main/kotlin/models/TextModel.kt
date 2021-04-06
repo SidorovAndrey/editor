@@ -1,6 +1,8 @@
 package models
 
 import core.Text
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
 
 class TextModel(private var text: Text) {
@@ -142,5 +144,26 @@ class TextModel(private var text: Text) {
                 selectEndRow = cursorRow
         else
             selectStartRow = cursorRow
+    }
+
+    fun copySelected() {
+        val textLines = text.getRange(selectStartRow, selectEndRow)
+        val text = if (textLines.size < 2)
+            textLines[0].substring(selectStartColumn, selectEndColumn)
+        else {
+            val builder = StringBuilder()
+            builder.appendLine(textLines.first().substring(selectStartColumn))
+            textLines
+                .drop(1)
+                .dropLast(1)
+                .forEach { str -> builder.appendLine(str) }
+
+            builder.appendLine(textLines.last().substring(0, selectEndColumn))
+
+            builder.toString()
+        }
+
+        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        clipboard.setContents(StringSelection(text), null)
     }
 }
