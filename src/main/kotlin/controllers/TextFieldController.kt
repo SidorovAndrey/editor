@@ -31,6 +31,7 @@ class TextFieldController(
         if (isControlPressed) {
             when (key) {
                 TextFieldView.KeyTypes.C -> this.textModel.copySelected()
+                TextFieldView.KeyTypes.V -> this.textModel.paste()
             }
         } else if (isShiftPressed) {
             if (!this.textModel.isSelecting)

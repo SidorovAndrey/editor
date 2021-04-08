@@ -2,6 +2,7 @@ package models
 
 import core.Text
 import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
 
@@ -165,5 +166,25 @@ class TextModel(private var text: Text) {
 
         val clipboard = Toolkit.getDefaultToolkit().systemClipboard
         clipboard.setContents(StringSelection(text), null)
+    }
+
+    fun paste() {
+        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        val bufferText = clipboard.getData(DataFlavor.stringFlavor) as String
+        val bufferLines = bufferText.split(System.lineSeparator())
+
+        text.addText(bufferLines.first(), cursorColumn)
+        cursorColumn += bufferLines.first().length
+        if (bufferLines.size > 1) {
+            addNewLine()
+            bufferLines.drop(1).take(bufferLines.size - 2).forEachIndexed { i, line -> run {
+                text.addText(line, 0)
+                cursorColumn += line.length
+                addNewLine()
+            }}
+
+            text.addText(bufferLines.last(), 0)
+            cursorColumn += bufferLines.last().length
+        }
     }
 }
