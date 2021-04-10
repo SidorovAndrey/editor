@@ -31,6 +31,14 @@ class InputTimer(delay: Long, private val callback: InputTimerCallback) {
         changed = true
     }
 
+    fun finish() {
+        val str = input.toString()
+        string = str
+        callback.call(str)
+        finished = true
+        changed = false
+    }
+
     private fun onTime() {
         if (!finished && !changed) {
             val str = input.toString()

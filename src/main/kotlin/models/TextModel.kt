@@ -38,6 +38,13 @@ class TextModel(private var text: Text) {
         text = Text(bufferedReader)
     }
 
+    fun getAllText(): String {
+        val lines = text.getRange(1, text.totalLines)
+        val builder = StringBuilder()
+        lines.forEach { line -> builder.appendLine(line) }
+        return builder.toString()
+    }
+
     fun resize(size: Int) {
         lastRow = firstRow + size
     }

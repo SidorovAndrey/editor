@@ -42,6 +42,9 @@ class TextFieldView(
                 if (isSymbol(e.keyChar)) {
                     handleChar(e.keyChar)
                 } else {
+                    if (!inputTimer!!.finished)
+                        inputTimer!!.finish()
+
                     val key = when (e.keyCode) {
                         KeyEvent.VK_UP -> KeyTypes.UP
                         KeyEvent.VK_DOWN -> KeyTypes.DOWN

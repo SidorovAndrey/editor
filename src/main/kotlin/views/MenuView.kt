@@ -11,11 +11,11 @@ import javax.swing.*
 class MenuView (
     viewRepository: ViewRepository,
     private val frame: JFrame
-) : BaseView(viewRepository), EventProducer<MenuView.FileSetCallback> {
+) : BaseView(viewRepository) {
 
     private val menuBar = JMenuBar()
-    private var selectedFile: File? = null
     private val onFileSetEvent: Event<FileSetCallback> = Event()
+    private val onFileSaveEvent: Event<FileSaveCallback> = Event()
 
     init {
         val fileMenu = JMenu("File")
@@ -28,21 +28,42 @@ class MenuView (
 
         val eventListener = MenuEventListener(openMenuItem, saveMenuItem)
         openMenuItem.addActionListener(eventListener)
+        saveMenuItem.addActionListener(eventListener)
 
         menuBar.add(fileMenu)
         frame.jMenuBar = menuBar
     }
 
-    override fun subscribe(who: Any, callback: FileSetCallback) {
-        this.onFileSetEvent.subscribe(who, callback)
-    }
-
-    override fun unsubscribe(who: Any) {
-        this.onFileSetEvent.unsubscribe(who)
-    }
-
     fun interface FileSetCallback {
         fun onSet(file: File)
+    }
+
+    fun asOnFileSetEventProducer(): EventProducer<FileSetCallback> {
+        return object : EventProducer<FileSetCallback> {
+            override fun subscribe(who: Any, callback: FileSetCallback) {
+                onFileSetEvent.subscribe(who, callback)
+            }
+
+            override fun unsubscribe(who: Any) {
+                onFileSetEvent.unsubscribe(who)
+            }
+        }
+    }
+
+    fun interface FileSaveCallback {
+        fun onSave(file: File)
+    }
+
+    fun asOnFileSaveEventProducer(): EventProducer<FileSaveCallback> {
+        return object : EventProducer<FileSaveCallback> {
+            override fun subscribe(who: Any, callback: FileSaveCallback) {
+                onFileSaveEvent.subscribe(who, callback)
+            }
+
+            override fun unsubscribe(who: Any) {
+                onFileSaveEvent.unsubscribe(who)
+            }
+        }
     }
 
     inner class MenuEventListener(
@@ -58,13 +79,27 @@ class MenuView (
                     this@MenuView.setFile(fileChooser.selectedFile)
                 }
             }
+
+            if (p0?.source == saveMenuItem) {
+                val fileChooser = JFileChooser()
+                fileChooser.currentDirectory = File(System.getProperty("user.home"))
+                val result = fileChooser.showSaveDialog(frame)
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    this@MenuView.saveFile(fileChooser.selectedFile)
+                }
+            }
         }
     }
 
     private fun setFile(file: File) {
-        this.selectedFile = file
         for (c in this.onFileSetEvent.getSubscribers()) {
             c.onSet(file)
+        }
+    }
+
+    private fun saveFile(file: File) {
+        for (c in this.onFileSaveEvent.getSubscribers()) {
+            c.onSave(file)
         }
     }
 }

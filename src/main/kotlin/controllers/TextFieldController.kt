@@ -1,25 +1,17 @@
 package controllers
 
-import models.FileModel
 import models.TextModel
 import views.TextFieldView
 import java.io.File
 
 class TextFieldController(
-    private val fileModel: FileModel,
     private val textModel: TextModel,
     private val textFieldView: TextFieldView) {
 
     init {
-        fileModel.subscribe(this) { file -> this.onFileSet(file) }
         textFieldView.asOnResizedEventProducer().subscribe(this) { value -> this.onResized(value) }
         textFieldView.asOnControlKeyPressEventProducer().subscribe(this) { key, isShiftPressed, isControlPressed -> this.onKeyPress(key, isShiftPressed, isControlPressed) }
         textFieldView.asOnTextChangedEventProducer().subscribe(this) { str -> this.onTextChanged(str) }
-    }
-
-    private fun onFileSet(file: File) {
-        this.textModel.loadText(file.bufferedReader())
-        this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
     }
 
     private fun onResized(value: Int) {
