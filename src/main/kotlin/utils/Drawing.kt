@@ -41,7 +41,7 @@ fun Graphics.drawSelection(
     } else if (startRow == currentRow) {
         val xOffset = startColumn * charSize + leftMargin
         val yOffset = currentRowIndex * lineHeight + topMargin
-        this.fillRect(xOffset, yOffset, lineLength * charSize, lineHeight)
+        this.fillRect(xOffset, yOffset, (lineLength + 1) * charSize - xOffset, lineHeight)
     } else if (startRow < currentRow && endRow > currentRow) {
         val yOffset = currentRowIndex * lineHeight + topMargin
         this.fillRect(leftMargin, yOffset, lineLength * charSize, lineHeight)

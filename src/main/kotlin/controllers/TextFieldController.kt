@@ -32,6 +32,7 @@ class TextFieldController(
             when (key) {
                 TextFieldView.KeyTypes.C -> this.textModel.copySelected()
                 TextFieldView.KeyTypes.V -> this.textModel.paste()
+                TextFieldView.KeyTypes.X -> this.textModel.cut()
             }
         } else if (isShiftPressed) {
             if (!this.textModel.isSelecting)
@@ -42,23 +43,12 @@ class TextFieldController(
                 TextFieldView.KeyTypes.DOWN -> this.textModel.moveSelectRow(1)
                 TextFieldView.KeyTypes.LEFT -> this.textModel.moveSelectColumn(-1)
                 TextFieldView.KeyTypes.RIGHT -> this.textModel.moveSelectColumn(1)
+                TextFieldView.KeyTypes.HOME -> this.textModel.moveSelectColumnToBegin()
+                TextFieldView.KeyTypes.END -> this.textModel.moveSelectColumnToEnd()
             }
-
-            this.textFieldView.setSelect(
-                this.textModel.selectStartRow,
-                this.textModel.selectStartColumn,
-                this.textModel.selectEndRow,
-                this.textModel.selectEndColumn
-            )
         } else {
 
             this.textModel.stopSelect()
-            this.textFieldView.setSelect(
-                1,
-                0,
-                1,
-                0
-            )
             when (key) {
                 TextFieldView.KeyTypes.UP -> this.textModel.moveCursorUp()
                 TextFieldView.KeyTypes.DOWN -> this.textModel.moveCursorDown()
@@ -73,6 +63,12 @@ class TextFieldController(
                 TextFieldView.KeyTypes.ENTER -> this.textModel.addNewLine()
             }
         }
+
+        this.textFieldView.setSelect(
+            this.textModel.selectStartRow,
+            this.textModel.selectStartColumn,
+            this.textModel.selectEndRow,
+            this.textModel.selectEndColumn)
 
         this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
     }

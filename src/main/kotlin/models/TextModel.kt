@@ -120,21 +120,47 @@ class TextModel(private var text: Text) {
 
     fun stopSelect() {
         isSelecting = false
+        selectStartRow = 0
+        selectEndRow = 0
+        selectStartColumn = 0
+        selectEndColumn = 0
     }
 
     fun moveSelectColumn(offset: Int) {
-        if (cursorColumn + offset < 0 || cursorColumn + offset > currentText[cursorRow].length)
+        if (cursorColumn + offset < 0 || cursorColumn + offset > currentText[cursorRow - 1].length)
             return
 
         cursorColumn += offset
-        if (cursorColumn > selectStartColumn)
-            selectEndColumn = cursorColumn
-        else
-            selectStartColumn = cursorColumn
+        updateSelectedColumn()
+    }
+
+    fun moveSelectColumnToBegin() {
+        moveSelectColumn(-cursorColumn)
+    }
+
+    fun moveSelectColumnToEnd() {
+        moveSelectColumn(text.currentLineText.length - cursorColumn)
+    }
+
+    private fun updateSelectedColumn() {
+        if (selectStartRow == selectEndRow) {
+            if (cursorColumn > selectStartColumn)
+                selectEndColumn = cursorColumn
+            else
+                selectStartColumn = cursorColumn
+        } else {
+            if (cursorRow == selectStartRow)
+                selectStartColumn = cursorColumn
+            else
+                selectEndColumn = cursorColumn
+        }
     }
 
     fun moveSelectRow(offset: Int) {
         text.move(offset)
+
+        if (text.currentLineText.length < cursorColumn)
+            cursorColumn = text.currentLineText.length
 
         if (cursorRow > selectEndRow)
             selectEndRow = cursorRow
@@ -145,11 +171,20 @@ class TextModel(private var text: Text) {
                 selectEndRow = cursorRow
         else
             selectStartRow = cursorRow
+
+        updateSelectedColumn()
     }
 
     fun copySelected() {
+        val text = getSelectedText()
+
+        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        clipboard.setContents(StringSelection(text), null)
+    }
+
+    private fun getSelectedText(): String {
         val textLines = text.getRange(selectStartRow, selectEndRow)
-        val text = if (textLines.size < 2)
+        return if (textLines.size < 2)
             textLines[0].substring(selectStartColumn, selectEndColumn)
         else {
             val builder = StringBuilder()
@@ -163,9 +198,6 @@ class TextModel(private var text: Text) {
 
             builder.toString()
         }
-
-        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-        clipboard.setContents(StringSelection(text), null)
     }
 
     fun paste() {
@@ -177,7 +209,7 @@ class TextModel(private var text: Text) {
         cursorColumn += bufferLines.first().length
         if (bufferLines.size > 1) {
             addNewLine()
-            bufferLines.drop(1).take(bufferLines.size - 2).forEachIndexed { i, line -> run {
+            bufferLines.drop(1).take(bufferLines.size - 2).forEach { line -> run {
                 text.addText(line, 0)
                 cursorColumn += line.length
                 addNewLine()
@@ -185,6 +217,34 @@ class TextModel(private var text: Text) {
 
             text.addText(bufferLines.last(), 0)
             cursorColumn += bufferLines.last().length
+        }
+    }
+
+    fun cut() {
+        copySelected()
+        deleteSelectedText()
+    }
+
+    private fun deleteSelectedText() {
+        if (selectStartRow == selectEndRow) {
+            text.deleteText(selectStartColumn, selectEndColumn)
+        } else {
+            while (cursorRow != selectStartRow)
+                text.move(-1)
+
+            text.deleteText(selectStartColumn, text.currentLineText.length - selectStartColumn)
+            text.move(1)
+            cursorColumn = 0
+
+            for (i in 0 until selectEndRow - selectStartRow - 1) {
+                text.removeLine()
+                text.move(1)
+            }
+
+            text.deleteText(0, selectEndColumn)
+            cursorColumn = text.mergeCurrentLineWithPrevious()
+
+            stopSelect()
         }
     }
 }
