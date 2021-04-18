@@ -1,6 +1,8 @@
 package models
 
 import core.Text
+import tokenizer.Token
+import tokenizer.Tokenizer
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
@@ -9,6 +11,8 @@ import java.io.BufferedReader
 class TextModel(private var text: Text) {
     private var firstRow = 1
     private var lastRow = 1
+
+    private val tokenizer = Tokenizer(text)
 
     val currentText: MutableList<String>
         get() = text.getRange(firstRow, lastRow)
@@ -43,6 +47,10 @@ class TextModel(private var text: Text) {
         val builder = StringBuilder()
         lines.forEach { line -> builder.appendLine(line) }
         return builder.toString()
+    }
+
+    fun getTokenizedText(): MutableList<Token> {
+        return tokenizer.getRange(firstRow, lastRow)
     }
 
     fun resize(size: Int) {

@@ -4,6 +4,7 @@ import ViewRepository
 import components.TextFieldComponent
 import events.Event
 import events.EventProducer
+import tokenizer.Token
 import utils.InputTimer
 import java.awt.event.*
 import javax.swing.JFrame
@@ -42,7 +43,7 @@ class TextFieldView(
                 if (isSymbol(e.keyChar)) {
                     handleChar(e.keyChar)
                 } else {
-                    if (!inputTimer!!.finished)
+                    if (inputTimer != null && !inputTimer!!.finished)
                         inputTimer!!.finish()
 
                     val key = when (e.keyCode) {
@@ -146,6 +147,10 @@ class TextFieldView(
 
     fun setText(text: MutableList<String>, row: Int, column: Int) {
         textField.setText(text, row, column)
+    }
+
+    fun setTokenizedText(text: MutableList<Token>) {
+        textField.setTokenizedText(text)
     }
 
     private fun handleChar(ch: Char) {

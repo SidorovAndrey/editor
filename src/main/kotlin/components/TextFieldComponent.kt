@@ -1,9 +1,8 @@
 package components
 
-import utils.drawBackground
-import utils.drawCursor
-import utils.drawSelection
-import utils.setMonospaceFont
+import tokenizer.Token
+import tokenizer.TokenKinds
+import utils.*
 import java.awt.Color
 import java.awt.Graphics
 import javax.swing.JComponent
@@ -16,6 +15,9 @@ class TextFieldComponent : JComponent() {
     private var text: MutableList<String> = mutableListOf()
     private var row: Int = 1
     private var column: Int = 0
+    private var tokenizedText: MutableList<Token> = mutableListOf()
+
+    private var drawTokenized = false
 
     private var selectStartRow = 0
     private var selectStartColumn = 0
@@ -28,6 +30,17 @@ class TextFieldComponent : JComponent() {
         this.text = text
         this.row = row
         this.column = column
+
+        drawTokenized = false
+
+        revalidate()
+        repaint()
+        requestFocus()
+    }
+
+    fun setTokenizedText(text: MutableList<Token>) {
+        tokenizedText = text
+        drawTokenized = true
         revalidate()
         repaint()
         requestFocus()
@@ -53,6 +66,17 @@ class TextFieldComponent : JComponent() {
         requestFocus()
     }
 
+    private fun getCurrentTokenizedRow(idx: Int): MutableList<Token> {
+        var i = 0
+        var currentTokens = tokenizedText.toList()
+        while (i < idx) {
+            currentTokens = currentTokens.dropWhile { t -> t.kind != TokenKinds.END_LINE }.drop(1)
+            ++i
+        }
+
+        return currentTokens.takeWhile { t -> t.kind != TokenKinds.END_LINE }.toMutableList()
+    }
+
     override fun paintComponent(g: Graphics?) {
         g!!.drawBackground(editorLeftMargin, editorTopMargin, width - 4, height -4, Color.CYAN)
 
@@ -75,7 +99,16 @@ class TextFieldComponent : JComponent() {
                 Color.LIGHT_GRAY
             )
 
-            g.drawString(line, textLeftMargin, current)
+            if (drawTokenized)
+                g.drawTokenizedLine(
+                    getCurrentTokenizedRow(i),
+                    textLeftMargin,
+                    current,
+                    charSize
+                )
+            else
+                g.drawString(line, textLeftMargin, current)
+
             current += lineHeight
 
             g.drawCursor(

@@ -1,5 +1,7 @@
 package utils
 
+import tokenizer.Token
+import tokenizer.TokenKinds
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
@@ -74,4 +76,33 @@ fun Graphics.drawCursor(
 
         this.color = prevColor
     }
+}
+
+fun Graphics.drawTokenizedLine(
+    tokenizedText: MutableList<Token>,
+    leftMargin: Int,
+    topMargin: Int,
+    charSize: Int
+) {
+    val keywordColor = Color.PINK
+    val identifierColor = Color.BLUE
+    val nothingColor = Color.BLACK
+    val commentColor = Color(0, 150, 0)
+
+    val prevColor = this.color
+    var currentLeftOffset = leftMargin
+    for (current in tokenizedText) {
+        when (current.kind) {
+            TokenKinds.NOTHING -> this.color = nothingColor
+            TokenKinds.COMMENT, TokenKinds.STRING -> this.color = commentColor
+            TokenKinds.IDENTIFIER -> this.color = identifierColor
+            TokenKinds.KEYWORD -> this.color = keywordColor
+        }
+
+        this.drawString(current.text, currentLeftOffset, topMargin)
+
+        currentLeftOffset += current.text.length * charSize
+    }
+
+    this.color = prevColor
 }

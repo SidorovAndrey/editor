@@ -63,10 +63,12 @@ class TextFieldController(
             this.textModel.selectEndColumn)
 
         this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
+        this.textFieldView.setTokenizedText(this.textModel.getTokenizedText())
     }
 
     private fun onTextChanged(str: String) {
         this.textModel.addText(str)
         this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
+        this.textFieldView.setTokenizedText(this.textModel.getTokenizedText())
     }
 }

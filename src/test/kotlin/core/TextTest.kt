@@ -93,9 +93,10 @@ class TextTest {
         val bufferedReader = BufferedReader(reader)
 
         val text = Text(bufferedReader)
-        val added = text.addLine()
+        val toAdd = "test"
+        val added = text.addLine(toAdd)
 
-        assert(added == "")
+        assert(added == toAdd)
         assert(text.move(-1) == lines[0])
         assert(text.move(2) == lines[1])
     }
