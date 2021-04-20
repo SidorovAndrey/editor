@@ -2,7 +2,6 @@ package controllers
 
 import models.TextModel
 import views.TextFieldView
-import java.io.File
 
 class TextFieldController(
     private val textModel: TextModel,
@@ -17,6 +16,7 @@ class TextFieldController(
     private fun onResized(value: Int) {
         textModel.resize(value)
         this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
+        this.textFieldView.setTokenizedText(this.textModel.getTokenizedText())
     }
 
     private fun onKeyPress(key: TextFieldView.KeyTypes, isShiftPressed: Boolean, isControlPressed: Boolean) {

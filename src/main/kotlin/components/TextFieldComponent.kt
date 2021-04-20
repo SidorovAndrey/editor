@@ -47,11 +47,40 @@ class TextFieldComponent : JComponent() {
     }
 
     fun addChar(ch: Char) {
-        val builder = StringBuilder(this.text[row - 1])
-        builder.insert(column, ch)
-        this.text[row - 1] = builder.toString()
+        val tokenizedRow = getTokenizedRow(row - 1)
+        val tokenInsertion = getTokenToInsert(tokenizedRow, column)
+
+        val builder = StringBuilder(tokenInsertion.first.text)
+        builder.insert(tokenInsertion.second, ch)
+        tokenInsertion.first.text = builder.toString()
         this.column++
         repaint()
+    }
+
+    private fun getTokenToInsert(tokenizedRow: MutableList<Token>, idx: Int): Pair<Token, Int> {
+        var current = 0
+        for ((tokenIdx, token) in tokenizedRow.withIndex()) {
+            var charIdx = 0
+            while (current < idx && charIdx < token.text.length) {
+                current++
+                charIdx++
+            }
+
+            if (current == idx) {
+                return if (token.kind == TokenKinds.END_LINE) {
+                    val newToken = Token("", TokenKinds.NOTHING)
+                    tokenizedRow.add(tokenIdx, newToken)
+                    Pair(newToken, 0)
+                } else {
+                    Pair(tokenizedRow[tokenIdx], charIdx)
+                }
+            }
+
+        }
+
+        val newToken = Token("", TokenKinds.NOTHING)
+        tokenizedRow.add(tokenizedRow.size - 1, newToken)
+        return Pair(newToken, 0)
     }
 
     fun setSelect(startRow: Int, startColumn: Int, endRow: Int, endColumn: Int) {
@@ -66,7 +95,10 @@ class TextFieldComponent : JComponent() {
         requestFocus()
     }
 
-    private fun getCurrentTokenizedRow(idx: Int): MutableList<Token> {
+    private fun getTokenizedRow(idx: Int): MutableList<Token> {
+        if (tokenizedText.count { t -> t.kind == TokenKinds.END_LINE } == 1)
+            return tokenizedText
+
         var i = 0
         var currentTokens = tokenizedText.toList()
         while (i < idx) {
@@ -99,15 +131,12 @@ class TextFieldComponent : JComponent() {
                 Color.LIGHT_GRAY
             )
 
-            if (drawTokenized)
-                g.drawTokenizedLine(
-                    getCurrentTokenizedRow(i),
-                    textLeftMargin,
-                    current,
-                    charSize
-                )
-            else
-                g.drawString(line, textLeftMargin, current)
+            g.drawTokenizedLine(
+                getTokenizedRow(i),
+                textLeftMargin,
+                current,
+                charSize
+            )
 
             current += lineHeight
 

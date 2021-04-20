@@ -1,3 +1,3 @@
 package tokenizer
 
-data class Token(val text: String, val kind: TokenKinds)
+data class Token(var text: String, val kind: TokenKinds)

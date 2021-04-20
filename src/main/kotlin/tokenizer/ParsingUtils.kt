@@ -8,7 +8,7 @@ fun readString(str: String, idx: Int): Pair<String, Int> {
         if (stringEnds == -1)
             return Pair(str.substring(idx, str.length), str.length)
 
-        return Pair(str.substring(idx, stringEnds + 2), stringEnds + 2)
+        return Pair(str.substring(idx, idx + stringEnds + 2), idx + stringEnds + 2)
     }
 
     if (str[idx] == '\'') {
@@ -61,7 +61,13 @@ fun readToCommentEnd(str: String, idx: Int): Pair<String, Int> {
 }
 
 fun readNothing(str: String, idx: Int): Pair<String, Int> {
-    val isNothing = { i: Int -> !str.drop(i)[0].isLetter() && !str.drop(i).startsWith("/*") && !str.drop(i).startsWith("//") }
+    val isNothing = { i: Int ->
+        !str.drop(i)[0].isLetter() &&
+        !str.drop(i).startsWith("/*") &&
+        !str.drop(i).startsWith("//") &&
+        !str.drop(i).startsWith("\"") &&
+        !str.drop(i).startsWith("\'")
+    }
 
     var i = idx
     while (i < str.length && isNothing(i)) {
