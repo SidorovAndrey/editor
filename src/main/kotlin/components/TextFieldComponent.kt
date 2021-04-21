@@ -110,7 +110,7 @@ class TextFieldComponent : JComponent() {
     }
 
     override fun paintComponent(g: Graphics?) {
-        g!!.drawBackground(editorLeftMargin, editorTopMargin, width - 4, height -4, Color.CYAN)
+        g!!.drawBackground(editorLeftMargin, editorTopMargin, width - 4, height -4)
 
         val fontSize = Configuration.fontSize
         val charSize = g.setMonospaceFont(fontSize)
@@ -127,8 +127,7 @@ class TextFieldComponent : JComponent() {
                 line.length,
                 lineHeight,
                 textLeftMargin,
-                editorTopMargin,
-                Color.LIGHT_GRAY
+                editorTopMargin
             )
 
             g.drawTokenizedLine(
@@ -148,8 +147,7 @@ class TextFieldComponent : JComponent() {
                 fontSize,
                 lineHeight,
                 textLeftMargin,
-                editorTopMargin,
-                Color.RED
+                editorTopMargin
             )
         }
     }

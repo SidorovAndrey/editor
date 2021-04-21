@@ -6,9 +6,9 @@ import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
 
-fun Graphics.drawBackground(x0: Int, y0: Int, xOffset: Int, yOffset: Int, color: Color) {
+fun Graphics.drawBackground(x0: Int, y0: Int, xOffset: Int, yOffset: Int) {
     val prevColor = this.color
-    this.color = color
+    this.color = Configuration.bgColor
     this.fillRect(x0, y0, xOffset, yOffset)
     this.color = prevColor
 }
@@ -29,10 +29,9 @@ fun Graphics.drawSelection(
     lineHeight: Int,
     leftMargin: Int,
     topMargin: Int,
-    color: Color,
 ) {
     val prevColor = this.color
-    this.color = color
+    this.color = Configuration.selectionColor
 
     val currentRow = currentRowIndex + 1
 
@@ -63,12 +62,11 @@ fun Graphics.drawCursor(
     fontSize: Int,
     lineHeight: Int,
     leftMargin: Int,
-    topMargin: Int,
-    color: Color
+    topMargin: Int
 ) {
     if (currentRowIndex + 1 == row) {
         val prevColor = this.color
-        this.color = color
+        this.color = Configuration.cursorColor
 
         val xOffset = column * charSize + leftMargin
         val yOffset = currentRowIndex * lineHeight + topMargin
@@ -84,17 +82,19 @@ fun Graphics.drawTokenizedLine(
     topMargin: Int,
     charSize: Int
 ) {
-    val keywordColor = Color.PINK
-    val identifierColor = Color.BLUE
-    val nothingColor = Color.BLACK
-    val commentColor = Color(0, 150, 0)
+    val keywordColor = Configuration.keywordFontColor
+    val identifierColor = Configuration.identifierFontColor
+    val nothingColor = Configuration.mainFontColor
+    val stringColor = Configuration.stringFontColor
+    val commentColor = Configuration.commentFontColor
 
     val prevColor = this.color
     var currentLeftOffset = leftMargin
     for (current in tokenizedText) {
         when (current.kind) {
             TokenKinds.NOTHING -> this.color = nothingColor
-            TokenKinds.COMMENT, TokenKinds.STRING -> this.color = commentColor
+            TokenKinds.COMMENT -> this.color = commentColor
+            TokenKinds.STRING -> this.color = stringColor
             TokenKinds.IDENTIFIER -> this.color = identifierColor
             TokenKinds.KEYWORD -> this.color = keywordColor
         }
