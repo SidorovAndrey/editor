@@ -15,8 +15,7 @@ class TextFieldController(
 
     private fun onResized(value: Int) {
         textModel.resize(value)
-        this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
-        this.textFieldView.setTokenizedText(this.textModel.getTokenizedText())
+        updateTextFieldView()
     }
 
     private fun onKeyPress(key: TextFieldView.KeyTypes, isShiftPressed: Boolean, isControlPressed: Boolean) {
@@ -56,19 +55,17 @@ class TextFieldController(
             }
         }
 
-        this.textFieldView.setSelect(
-            this.textModel.selectStartRow,
-            this.textModel.selectStartColumn,
-            this.textModel.selectEndRow,
-            this.textModel.selectEndColumn)
+        this.textFieldView.setSelect(this.textModel.selectCoordinates)
 
-        this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
-        this.textFieldView.setTokenizedText(this.textModel.getTokenizedText())
+        updateTextFieldView()
     }
 
     private fun onTextChanged(str: String) {
         this.textModel.addText(str)
-        this.textFieldView.setText(this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
-        this.textFieldView.setTokenizedText(this.textModel.getTokenizedText())
+        updateTextFieldView()
+    }
+
+    private fun updateTextFieldView() {
+        this.textFieldView.setTokenizedText(this.textModel.getTokenizedText(), this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
     }
 }

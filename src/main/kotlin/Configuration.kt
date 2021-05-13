@@ -14,6 +14,7 @@ object Configuration {
     private const val identifierFontColorKey = "identifier_font_color"
     private const val stringFontColorKey = "string_font_color"
     private const val commentFontColorKey = "comment_font_color"
+    private const val bracketHighlightColorKey = "bracket_highlight_color"
 
     var fontSize: Int = 0
         private set
@@ -45,6 +46,9 @@ object Configuration {
     var selectionColor: Color = Color(0, 0, 0)
         private set
 
+    var bracketHighlightColor: Color = Color(0, 0 ,0)
+        private set
+
     fun load(fileInputStream: FileInputStream) {
         val props = Properties()
         props.load(fileInputStream)
@@ -60,6 +64,7 @@ object Configuration {
         identifierFontColor = readColor(identifierFontColorKey, props)
         stringFontColor = readColor(stringFontColorKey, props)
         commentFontColor = readColor(commentFontColorKey, props)
+        bracketHighlightColor = readColor(bracketHighlightColorKey, props)
     }
 
     private fun readColor(key: String, props: Properties): Color {

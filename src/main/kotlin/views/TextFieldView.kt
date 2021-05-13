@@ -1,11 +1,14 @@
 package views
 
+import SelectCoordinates
+import TextCoordinate
 import ViewRepository
 import components.TextFieldComponent
 import events.Event
 import events.EventProducer
 import tokenizer.Token
 import utils.InputTimer
+import utils.getBracketCoordinates
 import java.awt.event.*
 import javax.swing.JFrame
 
@@ -73,6 +76,8 @@ class TextFieldView(
                 }
             }
         })
+
+        textField.requestFocus()
     }
 
     private fun isSymbol(ch: Char): Boolean {
@@ -145,12 +150,9 @@ class TextFieldView(
         }
     }
 
-    fun setText(text: MutableList<String>, row: Int, column: Int) {
-        textField.setText(text, row, column)
-    }
-
-    fun setTokenizedText(text: MutableList<Token>) {
-        textField.setTokenizedText(text)
+    fun setTokenizedText(text: MutableList<Token>, rawText: MutableList<String>, row: Int, column: Int) {
+        val bracketCoordinates = getBracketCoordinates(rawText, row, column)
+        textField.setText(text, rawText, row, column, bracketCoordinates)
     }
 
     private fun handleChar(ch: Char) {
@@ -166,7 +168,7 @@ class TextFieldView(
         textField.addChar(ch)
     }
 
-    fun setSelect(startRow: Int, startColumn: Int, endRow: Int, endColumn: Int) {
-        textField.setSelect(startRow, startColumn, endRow, endColumn)
+    fun setSelect(selectCoordinates: SelectCoordinates) {
+        textField.setSelect(selectCoordinates)
     }
 }

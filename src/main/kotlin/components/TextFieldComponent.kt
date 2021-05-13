@@ -1,9 +1,10 @@
 package components
 
+import SelectCoordinates
+import TextCoordinate
 import tokenizer.Token
 import tokenizer.TokenKinds
 import utils.*
-import java.awt.Color
 import java.awt.Graphics
 import javax.swing.JComponent
 
@@ -12,42 +13,35 @@ class TextFieldComponent : JComponent() {
     private val editorTopMargin = 2;
     private val textLeftMargin = editorLeftMargin + 10
 
-    private var text: MutableList<String> = mutableListOf()
-    private var row: Int = 1
+    private var row: Int = 0
     private var column: Int = 0
+    private var rawText: MutableList<String> = mutableListOf()
     private var tokenizedText: MutableList<Token> = mutableListOf()
-
-    private var drawTokenized = false
 
     private var selectStartRow = 0
     private var selectStartColumn = 0
     private var selectEndRow = 0
     private var selectEndColumn = 0
+    private var selectCoordinates = SelectCoordinates(TextCoordinate(0, 0), TextCoordinate(0, 0))
+
+    private var highlightBrackets = Pair(TextCoordinate(-1, -1), TextCoordinate(-1, -1))
 
     val lineHeight = Configuration.fontSize + Configuration.linesGap
 
-    fun setText(text: MutableList<String>, row: Int, column: Int) {
-        this.text = text
+    fun setText(text: MutableList<Token>, rawText: MutableList<String>, row: Int, column: Int, brackets: Pair<TextCoordinate, TextCoordinate>) {
+        tokenizedText = text
+        this.rawText = rawText
         this.row = row
         this.column = column
 
-        drawTokenized = false
-
-        revalidate()
-        repaint()
-        requestFocus()
-    }
-
-    fun setTokenizedText(text: MutableList<Token>) {
-        tokenizedText = text
-        drawTokenized = true
+        highlightBrackets = brackets
         revalidate()
         repaint()
         requestFocus()
     }
 
     fun addChar(ch: Char) {
-        val tokenizedRow = getTokenizedRow(row - 1)
+        val tokenizedRow = getTokenizedRow(row)
         val tokenInsertion = getTokenToInsert(tokenizedRow, column)
 
         val builder = StringBuilder(tokenInsertion.first.text)
@@ -83,13 +77,11 @@ class TextFieldComponent : JComponent() {
         return Pair(newToken, 0)
     }
 
-    fun setSelect(startRow: Int, startColumn: Int, endRow: Int, endColumn: Int) {
-        selectStartRow = startRow
-        selectStartColumn = startColumn
-        selectEndRow = endRow
-        selectEndColumn = endColumn
-        column = selectEndColumn
-        row = selectEndRow
+    fun setSelect(selectCoordinates: SelectCoordinates) {
+        this.selectCoordinates = selectCoordinates
+        column = selectCoordinates.end.column
+        row = selectCoordinates.end.row
+
         revalidate()
         repaint()
         requestFocus()
@@ -116,7 +108,7 @@ class TextFieldComponent : JComponent() {
         val charSize = g.setMonospaceFont(fontSize)
 
         var current = fontSize
-        for ((i, line) in text.withIndex()) {
+        for ((i, line) in rawText.withIndex()) {
             g.drawSelection(
                 i,
                 selectStartRow,
@@ -143,6 +135,17 @@ class TextFieldComponent : JComponent() {
                 i,
                 row,
                 column,
+                charSize,
+                fontSize,
+                lineHeight,
+                textLeftMargin,
+                editorTopMargin
+            )
+
+            g.drawHighlightedBracket(
+                row,
+                column,
+                highlightBrackets,
                 charSize,
                 fontSize,
                 lineHeight,

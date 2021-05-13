@@ -1,8 +1,8 @@
 package utils
 
+import TextCoordinate
 import tokenizer.Token
 import tokenizer.TokenKinds
-import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
 
@@ -64,7 +64,7 @@ fun Graphics.drawCursor(
     leftMargin: Int,
     topMargin: Int
 ) {
-    if (currentRowIndex + 1 == row) {
+    if (currentRowIndex == row) {
         val prevColor = this.color
         this.color = Configuration.cursorColor
 
@@ -102,6 +102,42 @@ fun Graphics.drawTokenizedLine(
         this.drawString(current.text, currentLeftOffset, topMargin)
 
         currentLeftOffset += current.text.length * charSize
+    }
+
+    this.color = prevColor
+}
+
+fun Graphics.drawHighlightedBracket(
+    currentRowIndex: Int,
+    currentColumnIndex: Int,
+    brackets: Pair<TextCoordinate, TextCoordinate>,
+    charSize: Int,
+    fontSize: Int,
+    lineHeight: Int,
+    leftMargin: Int,
+    topMargin: Int
+) {
+    val prevColor = this.color
+    this.color = Configuration.bracketHighlightColor
+
+    if (currentRowIndex == brackets.first.row && currentColumnIndex == brackets.first.column) {
+        val firstXOffset = brackets.first.column * charSize + leftMargin
+        val firstYOffset = brackets.first.row * lineHeight + topMargin
+        this.drawRect(firstXOffset, firstYOffset, charSize, fontSize)
+
+        val secondXOffset = brackets.second.column * charSize + leftMargin
+        val secondYOffset = brackets.second.row * lineHeight + topMargin
+        this.drawRect(secondXOffset, secondYOffset, charSize, fontSize)
+    }
+
+    if (currentRowIndex == brackets.second.row && currentColumnIndex == brackets.first.column) {
+        val firstXOffset = brackets.first.column * charSize + leftMargin
+        val firstYOffset = brackets.first.row * lineHeight + topMargin
+        this.drawRect(firstXOffset, firstYOffset, charSize, fontSize)
+
+        val secondXOffset = brackets.second.column * charSize + leftMargin
+        val secondYOffset = brackets.second.row * lineHeight + topMargin
+        this.drawRect(secondXOffset, secondYOffset, charSize, fontSize)
     }
 
     this.color = prevColor

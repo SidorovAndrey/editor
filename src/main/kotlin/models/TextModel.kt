@@ -1,5 +1,7 @@
 package models
 
+import SelectCoordinates
+import TextCoordinate
 import core.Text
 import tokenizer.Token
 import tokenizer.Tokenizer
@@ -9,37 +11,29 @@ import java.awt.datatransfer.StringSelection
 import java.io.BufferedReader
 
 class TextModel(private var text: Text) {
-    private var firstRow = 1
+    private var firstRow = 0
     private var lastRow = 1
 
-    private val tokenizer = Tokenizer(text)
+    private var tokenizer = Tokenizer(text)
 
     val currentText: MutableList<String>
-        get() = text.getRange(firstRow, lastRow)
+        get() = text.getRange(firstRow + 1, lastRow)
 
     var cursorColumn: Int = 0
         private set
 
     val cursorRow: Int
-        get() = text.lineNumber
+        get() = text.lineNumber - 1
+
 
     var isSelecting: Boolean = false
         private set
 
-    var selectStartRow: Int = 0
-        private set
-
-    var selectStartColumn: Int = 0
-        private set
-
-    var selectEndRow: Int = 0
-        private set
-
-    var selectEndColumn: Int = 0
-        private set
+    var selectCoordinates = SelectCoordinates(TextCoordinate(0, 0), TextCoordinate(0, 0))
 
     fun loadText(bufferedReader: BufferedReader) {
         text = Text(bufferedReader)
+        tokenizer = Tokenizer(text)
     }
 
     fun getAllText(): String {
@@ -50,11 +44,11 @@ class TextModel(private var text: Text) {
     }
 
     fun getTokenizedText(): MutableList<Token> {
-        return tokenizer.getRange(firstRow, lastRow)
+        return tokenizer.getRange(firstRow + 1, lastRow)
     }
 
     fun resize(size: Int) {
-        lastRow = firstRow + size
+        lastRow = firstRow + size + 1
     }
 
     fun moveCursorUp() {
@@ -127,18 +121,12 @@ class TextModel(private var text: Text) {
 
     fun startSelect() {
         isSelecting = true
-        selectStartRow = cursorRow
-        selectEndRow = cursorRow
-        selectStartColumn = cursorColumn
-        selectEndColumn = cursorColumn
+        selectCoordinates = SelectCoordinates(TextCoordinate(cursorRow, cursorColumn), TextCoordinate(cursorRow, cursorColumn))
     }
 
     fun stopSelect() {
         isSelecting = false
-        selectStartRow = 0
-        selectEndRow = 0
-        selectStartColumn = 0
-        selectEndColumn = 0
+        selectCoordinates = SelectCoordinates(TextCoordinate(0, 0), TextCoordinate(0, 0))
     }
 
     fun moveSelectColumn(offset: Int) {
@@ -158,16 +146,16 @@ class TextModel(private var text: Text) {
     }
 
     private fun updateSelectedColumn() {
-        if (selectStartRow == selectEndRow) {
-            if (cursorColumn > selectStartColumn)
-                selectEndColumn = cursorColumn
+        if (selectCoordinates.start.row == selectCoordinates.end.row) {
+            if (cursorColumn > selectCoordinates.start.column)
+                selectCoordinates.end.column = cursorColumn
             else
-                selectStartColumn = cursorColumn
+                selectCoordinates.start.column = cursorColumn
         } else {
-            if (cursorRow == selectStartRow)
-                selectStartColumn = cursorColumn
+            if (cursorRow == selectCoordinates.start.row)
+                selectCoordinates.start.column = cursorColumn
             else
-                selectEndColumn = cursorColumn
+                selectCoordinates.end.column = cursorColumn
         }
     }
 
@@ -177,15 +165,15 @@ class TextModel(private var text: Text) {
         if (text.currentLineText.length < cursorColumn)
             cursorColumn = text.currentLineText.length
 
-        if (cursorRow > selectEndRow)
-            selectEndRow = cursorRow
-        else if (cursorRow >= selectStartRow)
+        if (cursorRow > selectCoordinates.end.row)
+            selectCoordinates.end.row = cursorRow
+        else if (cursorRow >= selectCoordinates.start.row)
             if (offset > 0)
-                selectStartRow = cursorRow
+                selectCoordinates.start.row = cursorRow
             else
-                selectEndRow = cursorRow
+                selectCoordinates.end.row = cursorRow
         else
-            selectStartRow = cursorRow
+            selectCoordinates.start.row = cursorRow
 
         updateSelectedColumn()
     }
@@ -198,18 +186,18 @@ class TextModel(private var text: Text) {
     }
 
     private fun getSelectedText(): String {
-        val textLines = text.getRange(selectStartRow, selectEndRow)
+        val textLines = text.getRange(selectCoordinates.start.row, selectCoordinates.end.row)
         return if (textLines.size < 2)
-            textLines[0].substring(selectStartColumn, selectEndColumn)
+            textLines[0].substring(selectCoordinates.start.column, selectCoordinates.end.column)
         else {
             val builder = StringBuilder()
-            builder.appendLine(textLines.first().substring(selectStartColumn))
+            builder.appendLine(textLines.first().substring(selectCoordinates.start.column))
             textLines
                 .drop(1)
                 .dropLast(1)
                 .forEach { str -> builder.appendLine(str) }
 
-            builder.appendLine(textLines.last().substring(0, selectEndColumn))
+            builder.appendLine(textLines.last().substring(0, selectCoordinates.end.column))
 
             builder.toString()
         }
@@ -241,22 +229,22 @@ class TextModel(private var text: Text) {
     }
 
     private fun deleteSelectedText() {
-        if (selectStartRow == selectEndRow) {
-            text.deleteText(selectStartColumn, selectEndColumn)
+        if (selectCoordinates.start.row == selectCoordinates.end.row) {
+            text.deleteText(selectCoordinates.start.column, selectCoordinates.end.column)
         } else {
-            while (cursorRow != selectStartRow)
+            while (cursorRow != selectCoordinates.start.row)
                 text.move(-1)
 
-            text.deleteText(selectStartColumn, text.currentLineText.length - selectStartColumn)
+            text.deleteText(selectCoordinates.start.column, text.currentLineText.length - selectCoordinates.start.column)
             text.move(1)
             cursorColumn = 0
 
-            for (i in 0 until selectEndRow - selectStartRow - 1) {
+            for (i in 0 until selectCoordinates.end.row - selectCoordinates.start.row - 1) {
                 text.removeLine()
                 text.move(1)
             }
 
-            text.deleteText(0, selectEndColumn)
+            text.deleteText(0, selectCoordinates.end.column)
             cursorColumn = text.mergeCurrentLineWithPrevious()
 
             stopSelect()

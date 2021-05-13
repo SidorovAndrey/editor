@@ -13,7 +13,7 @@ class MenuController(private val textModel: TextModel, private val textFieldView
 
     private fun onFileSet(file: File) {
         textModel.loadText(file.bufferedReader())
-        textFieldView.setText(textModel.currentText, textModel.cursorRow, textModel.cursorColumn)
+        textFieldView.setTokenizedText(textModel.getTokenizedText(), textModel.currentText, textModel.cursorRow, textModel.cursorColumn)
     }
 
     private fun onFileSave(file: File) {
