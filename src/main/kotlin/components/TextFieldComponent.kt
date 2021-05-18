@@ -98,6 +98,9 @@ class TextFieldComponent : JComponent() {
             ++i
         }
 
+        if (currentTokens.isNotEmpty() && currentTokens[0].kind == TokenKinds.END_LINE)
+            return currentTokens.take(1).toMutableList()
+
         return currentTokens.takeWhile { t -> t.kind != TokenKinds.END_LINE }.toMutableList()
     }
 

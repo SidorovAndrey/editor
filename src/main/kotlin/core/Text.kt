@@ -97,7 +97,9 @@ class Text(textBuffer: BufferedReader) {
         }
 
         prev.next = current.next
-        prev.next!!.prev = prev
+        if (prev.next != null)
+            prev.next!!.prev = prev
+
         totalLines--
         return updateCurrentLine(prev)
     }
