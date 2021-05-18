@@ -42,7 +42,7 @@ class TextFieldComponent : JComponent() {
 
     fun addChar(ch: Char) {
         val tokenizedRow = getTokenizedRow(row)
-        val tokenInsertion = getTokenToInsert(tokenizedRow, column)
+        val tokenInsertion = getTokenToInsert(tokenizedRow)
 
         val builder = StringBuilder(tokenInsertion.first.text)
         builder.insert(tokenInsertion.second, ch)
@@ -51,30 +51,39 @@ class TextFieldComponent : JComponent() {
         repaint()
     }
 
-    private fun getTokenToInsert(tokenizedRow: MutableList<Token>, idx: Int): Pair<Token, Int> {
+    private fun getTokenToInsert(tokenizedRow: MutableList<Token>): Pair<Token, Int> {
+        // try to find existing token to insert
         var current = 0
         for ((tokenIdx, token) in tokenizedRow.withIndex()) {
             var charIdx = 0
-            while (current < idx && charIdx < token.text.length) {
+            while (current < column && charIdx < token.text.length) {
                 current++
                 charIdx++
             }
 
-            if (current == idx) {
-                return if (token.kind == TokenKinds.END_LINE) {
-                    val newToken = Token("", TokenKinds.NOTHING)
-                    tokenizedRow.add(tokenIdx, newToken)
-                    Pair(newToken, 0)
-                } else {
-                    Pair(tokenizedRow[tokenIdx], charIdx)
-                }
+            if (current == column && token.kind != TokenKinds.END_LINE) {
+                return Pair(tokenizedRow[tokenIdx], charIdx)
             }
-
         }
 
+        // if not found, insert a new one
         val newToken = Token("", TokenKinds.NOTHING)
-        tokenizedRow.add(tokenizedRow.size - 1, newToken)
+        insertToken(newToken)
         return Pair(newToken, 0)
+    }
+
+    private fun insertToken(token: Token) {
+        var idx = 0
+        var currentRow = 0
+        while (currentRow < row) {
+            if (tokenizedText[idx].kind == TokenKinds.END_LINE)
+                currentRow++
+
+            idx++
+        }
+
+        idx += column
+        tokenizedText.add(idx, token)
     }
 
     fun setSelect(selectCoordinates: SelectCoordinates) {
