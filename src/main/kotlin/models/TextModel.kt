@@ -186,7 +186,8 @@ class TextModel(private var text: Text) {
     }
 
     private fun getSelectedText(): String {
-        val textLines = text.getRange(selectCoordinates.start.row, selectCoordinates.end.row)
+        // TODO: fix this call when refactor coordinates
+        val textLines = text.getRange(selectCoordinates.start.row + 1, selectCoordinates.end.row + 1)
         return if (textLines.size < 2)
             textLines[0].substring(selectCoordinates.start.column, selectCoordinates.end.column)
         else {
@@ -226,11 +227,12 @@ class TextModel(private var text: Text) {
     fun cut() {
         copySelected()
         deleteSelectedText()
+        stopSelect()
     }
 
     private fun deleteSelectedText() {
         if (selectCoordinates.start.row == selectCoordinates.end.row) {
-            text.deleteText(selectCoordinates.start.column, selectCoordinates.end.column)
+            text.deleteText(selectCoordinates.start.column, selectCoordinates.end.column - selectCoordinates.start.column)
         } else {
             while (cursorRow != selectCoordinates.start.row)
                 text.move(-1)
