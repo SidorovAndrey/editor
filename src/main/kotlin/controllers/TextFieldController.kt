@@ -55,7 +55,7 @@ class TextFieldController(
             }
         }
 
-        this.textFieldView.setSelect(this.textModel.selectCoordinates)
+        this.textFieldView.setSelect(this.textModel.selectCoordinates, this.textModel.cursorRow, this.textModel.cursorColumn)
 
         updateTextFieldView()
     }

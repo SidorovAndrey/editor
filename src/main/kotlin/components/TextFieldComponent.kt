@@ -18,10 +18,6 @@ class TextFieldComponent : JComponent() {
     private var rawText: MutableList<String> = mutableListOf()
     private var tokenizedText: MutableList<Token> = mutableListOf()
 
-    private var selectStartRow = 0
-    private var selectStartColumn = 0
-    private var selectEndRow = 0
-    private var selectEndColumn = 0
     private var selectCoordinates = SelectCoordinates(TextCoordinate(0, 0), TextCoordinate(0, 0))
 
     private var highlightBrackets = Pair(TextCoordinate(-1, -1), TextCoordinate(-1, -1))
@@ -86,10 +82,10 @@ class TextFieldComponent : JComponent() {
         tokenizedText.add(idx, token)
     }
 
-    fun setSelect(selectCoordinates: SelectCoordinates) {
+    fun setSelect(selectCoordinates: SelectCoordinates, cursorRow: Int, cursorColumn: Int) {
         this.selectCoordinates = selectCoordinates
-        column = selectCoordinates.end.column
-        row = selectCoordinates.end.row
+        column = cursorRow
+        row = cursorColumn
 
         revalidate()
         repaint()
@@ -123,10 +119,10 @@ class TextFieldComponent : JComponent() {
         for ((i, line) in rawText.withIndex()) {
             g.drawSelection(
                 i,
-                selectStartRow,
-                selectStartColumn,
-                selectEndRow,
-                selectEndColumn,
+                selectCoordinates.start.row,
+                selectCoordinates.start.column,
+                selectCoordinates.end.row,
+                selectCoordinates.end.column,
                 charSize,
                 line.length,
                 lineHeight,

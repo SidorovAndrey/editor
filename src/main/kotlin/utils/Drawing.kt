@@ -33,20 +33,18 @@ fun Graphics.drawSelection(
     val prevColor = this.color
     this.color = Configuration.selectionColor
 
-    val currentRow = currentRowIndex + 1
-
-    if (startRow == currentRow && endRow == currentRow) {
+    if (startRow == currentRowIndex && endRow == currentRowIndex) {
         val xOffset = startColumn * charSize + leftMargin
         val yOffset = currentRowIndex * lineHeight + topMargin
         this.fillRect(xOffset, yOffset, (endColumn - startColumn) * charSize, lineHeight)
-    } else if (startRow == currentRow) {
+    } else if (startRow == currentRowIndex) {
         val xOffset = startColumn * charSize + leftMargin
         val yOffset = currentRowIndex * lineHeight + topMargin
         this.fillRect(xOffset, yOffset, (lineLength + 1) * charSize - xOffset, lineHeight)
-    } else if (startRow < currentRow && endRow > currentRow) {
+    } else if (startRow < currentRowIndex && endRow > currentRowIndex) {
         val yOffset = currentRowIndex * lineHeight + topMargin
         this.fillRect(leftMargin, yOffset, lineLength * charSize, lineHeight)
-    } else if (endRow == currentRow) {
+    } else if (endRow == currentRowIndex) {
         val yOffset = currentRowIndex * lineHeight + topMargin
         this.fillRect(leftMargin, yOffset, endColumn * charSize, lineHeight)
     }

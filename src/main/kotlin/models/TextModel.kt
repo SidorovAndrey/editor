@@ -130,7 +130,7 @@ class TextModel(private var text: Text) {
     }
 
     fun moveSelectColumn(offset: Int) {
-        if (cursorColumn + offset < 0 || cursorColumn + offset > currentText[cursorRow - 1].length)
+        if (cursorColumn + offset < 0 || cursorColumn + offset > currentText[cursorRow].length)
             return
 
         cursorColumn += offset

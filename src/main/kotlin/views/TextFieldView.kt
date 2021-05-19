@@ -168,7 +168,7 @@ class TextFieldView(
         textField.addChar(ch)
     }
 
-    fun setSelect(selectCoordinates: SelectCoordinates) {
-        textField.setSelect(selectCoordinates)
+    fun setSelect(selectCoordinates: SelectCoordinates, row: Int, column: Int) {
+        textField.setSelect(selectCoordinates, row, column)
     }
 }
