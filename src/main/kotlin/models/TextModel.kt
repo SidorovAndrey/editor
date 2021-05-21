@@ -29,6 +29,7 @@ class TextModel(private var text: Text) {
     var isSelecting: Boolean = false
         private set
 
+    var selectInitialCoordinates = TextCoordinate(0, 0)
     var selectCoordinates = SelectCoordinates(TextCoordinate(0, 0), TextCoordinate(0, 0))
 
     fun loadText(bufferedReader: BufferedReader) {
@@ -122,11 +123,13 @@ class TextModel(private var text: Text) {
     fun startSelect() {
         isSelecting = true
         selectCoordinates = SelectCoordinates(TextCoordinate(cursorRow, cursorColumn), TextCoordinate(cursorRow, cursorColumn))
+        selectInitialCoordinates = TextCoordinate(cursorRow, cursorColumn)
     }
 
     fun stopSelect() {
         isSelecting = false
         selectCoordinates = SelectCoordinates(TextCoordinate(0, 0), TextCoordinate(0, 0))
+        selectInitialCoordinates = TextCoordinate(0, 0)
     }
 
     fun moveSelectColumn(offset: Int) {
@@ -147,7 +150,11 @@ class TextModel(private var text: Text) {
 
     private fun updateSelectedColumn() {
         if (selectCoordinates.start.row == selectCoordinates.end.row) {
-            if (cursorColumn > selectCoordinates.start.column)
+            if (cursorColumn == selectInitialCoordinates.column) {
+                selectCoordinates.start.column = cursorColumn
+                selectCoordinates.end.column = cursorColumn
+            }
+            else if (cursorColumn > selectInitialCoordinates.column)
                 selectCoordinates.end.column = cursorColumn
             else
                 selectCoordinates.start.column = cursorColumn
