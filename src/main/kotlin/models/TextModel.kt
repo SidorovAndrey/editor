@@ -12,18 +12,18 @@ import java.io.BufferedReader
 
 class TextModel(private var text: Text) {
     private var firstRow = 0
-    private var lastRow = 1
+    private var lastRow = 0
 
     private var tokenizer = Tokenizer(text)
 
     val currentText: MutableList<String>
-        get() = text.getRange(firstRow + 1, lastRow)
+        get() = text.getRange(firstRow, lastRow)
 
     var cursorColumn: Int = 0
         private set
 
     val cursorRow: Int
-        get() = text.lineNumber - 1
+        get() = text.lineNumber
 
 
     var isSelecting: Boolean = false
@@ -45,11 +45,11 @@ class TextModel(private var text: Text) {
     }
 
     fun getTokenizedText(): MutableList<Token> {
-        return tokenizer.getRange(firstRow + 1, lastRow)
+        return tokenizer.getRange(firstRow, lastRow)
     }
 
     fun resize(size: Int) {
-        lastRow = firstRow + size + 1
+        lastRow = firstRow + size
     }
 
     fun moveCursorUp() {
@@ -193,8 +193,7 @@ class TextModel(private var text: Text) {
     }
 
     private fun getSelectedText(): String {
-        // TODO: fix this call when refactor coordinates
-        val textLines = text.getRange(selectCoordinates.start.row + 1, selectCoordinates.end.row + 1)
+        val textLines = text.getRange(selectCoordinates.start.row, selectCoordinates.end.row)
         return if (textLines.size < 2)
             textLines[0].substring(selectCoordinates.start.column, selectCoordinates.end.column)
         else {

@@ -32,7 +32,7 @@ class Text(textBuffer: BufferedReader) {
     init {
         head = TextLine(textBuffer.readLine() ?: "")
         currentLine = head
-        lineNumber = 1
+        lineNumber = 0
         totalLines = 1
 
         var current: TextLine = head
@@ -105,11 +105,11 @@ class Text(textBuffer: BufferedReader) {
     }
 
     fun getRange(start: Int, end: Int): MutableList<String> {
-        if (start < 1 || end < 1 || start > end)
+        if (start < 0 || end < 0 || start > end)
             throw IllegalArgumentException("Indexes should represent positions of line in text, values start=${start}; end=${end} are incorrect")
 
         var current = head;
-        var idx = 1
+        var idx = 0
         val list = mutableListOf<String>()
         while (idx < start) {
             if (current.next == null)
@@ -159,7 +159,7 @@ class Text(textBuffer: BufferedReader) {
      * Merges current line with previous. Returns position where text was merged
      */
     fun mergeCurrentLineWithPrevious(): Int {
-        if (lineNumber == 1) return 0
+        if (lineNumber == 0) return 0
 
         val restText = currentLineText
         removeLine()
