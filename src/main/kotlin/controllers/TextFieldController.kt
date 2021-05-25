@@ -1,5 +1,6 @@
 package controllers
 
+import TextCoordinate
 import models.TextModel
 import views.TextFieldView
 
@@ -11,6 +12,7 @@ class TextFieldController(
         textFieldView.asOnResizedEventProducer().subscribe(this) { value -> this.onResized(value) }
         textFieldView.asOnControlKeyPressEventProducer().subscribe(this) { key, isShiftPressed, isControlPressed -> this.onKeyPress(key, isShiftPressed, isControlPressed) }
         textFieldView.asOnTextChangedEventProducer().subscribe(this) { str -> this.onTextChanged(str) }
+        textFieldView.asOnCursorChangedEventProducer().subscribe(this) { coordinates -> this.onCursorChanged(coordinates) }
     }
 
     private fun onResized(value: Int) {
@@ -55,7 +57,7 @@ class TextFieldController(
             }
         }
 
-        this.textFieldView.setSelect(this.textModel.selectCoordinates, this.textModel.cursorRow, this.textModel.cursorColumn)
+        this.textFieldView.setSelect(this.textModel.selectCoordinates, TextCoordinate(this.textModel.cursorRow, this.textModel.cursorColumn))
 
         updateTextFieldView()
     }
@@ -65,7 +67,12 @@ class TextFieldController(
         updateTextFieldView()
     }
 
+    private fun onCursorChanged(textCoordinate: TextCoordinate) {
+        this.textModel.setCursor(textCoordinate)
+        updateTextFieldView()
+    }
+
     private fun updateTextFieldView() {
-        this.textFieldView.setTokenizedText(this.textModel.getTokenizedText(), this.textModel.currentText, this.textModel.cursorRow, this.textModel.cursorColumn)
+        this.textFieldView.setTokenizedText(this.textModel.getTokenizedText(), this.textModel.currentText, TextCoordinate(this.textModel.cursorRow, this.textModel.cursorColumn))
     }
 }

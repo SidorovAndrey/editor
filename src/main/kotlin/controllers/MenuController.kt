@@ -1,5 +1,6 @@
 package controllers
 
+import TextCoordinate
 import models.TextModel
 import views.MenuView
 import views.TextFieldView
@@ -13,7 +14,7 @@ class MenuController(private val textModel: TextModel, private val textFieldView
 
     private fun onFileSet(file: File) {
         textModel.loadText(file.bufferedReader())
-        textFieldView.setTokenizedText(textModel.getTokenizedText(), textModel.currentText, textModel.cursorRow, textModel.cursorColumn)
+        textFieldView.setTokenizedText(textModel.getTokenizedText(), textModel.currentText, TextCoordinate(textModel.cursorRow, textModel.cursorColumn))
     }
 
     private fun onFileSave(file: File) {

@@ -23,7 +23,7 @@ class TextModel(private var text: Text) {
         private set
 
     val cursorRow: Int
-        get() = text.lineNumber
+        get() = text.lineIndex
 
 
     var isSelecting: Boolean = false
@@ -76,13 +76,13 @@ class TextModel(private var text: Text) {
     }
 
     fun moveCursorToFirstLine() {
-        text.move(-text.lineNumber)
+        text.move(-text.lineIndex)
         if (cursorColumn > text.currentLineText.length)
             cursorColumn = text.currentLineText.length
     }
 
     fun moveCursorToLastLine() {
-        text.move(text.totalLines - text.lineNumber)
+        text.move(text.totalLines - text.lineIndex)
         if (cursorColumn > text.currentLineText.length)
             cursorColumn = text.currentLineText.length
     }
@@ -257,5 +257,15 @@ class TextModel(private var text: Text) {
 
             stopSelect()
         }
+    }
+
+    fun setCursor(textCoordinate: TextCoordinate) {
+        text.move(textCoordinate.row - text.lineIndex)
+        cursorColumn =
+            if (textCoordinate.column < text.currentLineText.length)
+                textCoordinate.column
+            else
+                text.currentLineText.length
+
     }
 }

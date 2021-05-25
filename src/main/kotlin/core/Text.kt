@@ -7,7 +7,7 @@ class Text(textBuffer: BufferedReader) {
     private var head: TextLine
     private var currentLine: TextLine
 
-    var lineNumber: Int
+    var lineIndex: Int
         private set
 
     var totalLines: Int
@@ -32,7 +32,7 @@ class Text(textBuffer: BufferedReader) {
     init {
         head = TextLine(textBuffer.readLine() ?: "")
         currentLine = head
-        lineNumber = 0
+        lineIndex = 0
         totalLines = 1
 
         var current: TextLine = head
@@ -58,7 +58,7 @@ class Text(textBuffer: BufferedReader) {
                     return updateCurrentLine(current)
 
                 current = current.next!!
-                lineNumber++
+                lineIndex++
             }
         } else {
             for (i in range) {
@@ -66,7 +66,7 @@ class Text(textBuffer: BufferedReader) {
                     return updateCurrentLine(current)
 
                 current = current.prev!!
-                lineNumber--
+                lineIndex--
             }
         }
 
@@ -82,7 +82,7 @@ class Text(textBuffer: BufferedReader) {
         created.prev = current
         created.next = next
         totalLines++
-        lineNumber++
+        lineIndex++
 
         return updateCurrentLine(created)
     }
@@ -159,13 +159,13 @@ class Text(textBuffer: BufferedReader) {
      * Merges current line with previous. Returns position where text was merged
      */
     fun mergeCurrentLineWithPrevious(): Int {
-        if (lineNumber == 0) return 0
+        if (lineIndex == 0) return 0
 
         val restText = currentLineText
         removeLine()
         val mergePosition = currentLineText.length
         addText(restText, currentLineText.length)
-        lineNumber--
+        lineIndex--
 
         return mergePosition
     }

@@ -3,20 +3,20 @@ package utils
 import TextCoordinate
 import java.security.InvalidParameterException
 
-fun getBracketCoordinates(text: MutableList<String>, cursorRow: Int, cursorColumn: Int): Pair<TextCoordinate, TextCoordinate> {
-    val row = text[cursorRow]
-    if (row.isEmpty() || cursorColumn >= row.length)
+fun getBracketCoordinates(text: MutableList<String>, textCoordinate: TextCoordinate): Pair<TextCoordinate, TextCoordinate> {
+    val row = text[textCoordinate.row]
+    if (row.isEmpty() || textCoordinate.column >= row.length)
         return Pair(TextCoordinate(-1, -1), TextCoordinate(-1, -1))
 
-    val bracket =  row[cursorColumn]
+    val bracket =  row[textCoordinate.column]
     val bracketTest = isBracket(bracket)
 
     // go to right
     if (bracketTest == 1) {
         val bracketPair = getBracketPair(bracket)
 
-        var i = cursorColumn
-        var rowIdx = cursorRow
+        var i = textCoordinate.column
+        var rowIdx = textCoordinate.row
         var brackets = 1
         while (brackets > 0) {
             i++
@@ -37,15 +37,15 @@ fun getBracketCoordinates(text: MutableList<String>, cursorRow: Int, cursorColum
             }
         }
 
-        return Pair(TextCoordinate(cursorRow, cursorColumn), TextCoordinate(rowIdx, i))
+        return Pair(TextCoordinate(textCoordinate.row, textCoordinate.column), TextCoordinate(rowIdx, i))
     }
 
     // go to left
     if (bracketTest == -1) {
         val bracketPair = getBracketPair(bracket)
 
-        var i = cursorColumn
-        var rowIdx = cursorRow
+        var i = textCoordinate.column
+        var rowIdx = textCoordinate.row
         var brackets = 1
         while (brackets > 0) {
             i--
@@ -65,7 +65,7 @@ fun getBracketCoordinates(text: MutableList<String>, cursorRow: Int, cursorColum
             }
         }
 
-        return Pair(TextCoordinate(cursorRow, cursorColumn), TextCoordinate(rowIdx, i))
+        return Pair(TextCoordinate(textCoordinate.row, textCoordinate.column), TextCoordinate(rowIdx, i))
     }
 
     // it is not a bracket

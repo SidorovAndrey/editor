@@ -5,7 +5,11 @@ import TextCoordinate
 import tokenizer.Token
 import tokenizer.TokenKinds
 import utils.*
+import java.awt.Cursor
 import java.awt.Graphics
+import java.awt.Toolkit
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JComponent
 
 class TextFieldComponent : JComponent() {
@@ -13,8 +17,7 @@ class TextFieldComponent : JComponent() {
     private val editorTopMargin = 2;
     private val textLeftMargin = editorLeftMargin + 10
 
-    private var row: Int = 0
-    private var column: Int = 0
+    private var cursorPosition = TextCoordinate(0, 0)
     private var rawText: MutableList<String> = mutableListOf()
     private var tokenizedText: MutableList<Token> = mutableListOf()
 
@@ -23,12 +26,17 @@ class TextFieldComponent : JComponent() {
     private var highlightBrackets = Pair(TextCoordinate(-1, -1), TextCoordinate(-1, -1))
 
     val lineHeight = Configuration.fontSize + Configuration.linesGap
+    var charWidth: Int = 0
+        private set
 
-    fun setText(text: MutableList<Token>, rawText: MutableList<String>, row: Int, column: Int, brackets: Pair<TextCoordinate, TextCoordinate>) {
+    init {
+        cursor = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)
+    }
+
+    fun setText(text: MutableList<Token>, rawText: MutableList<String>, textCoordinate: TextCoordinate, brackets: Pair<TextCoordinate, TextCoordinate>) {
         tokenizedText = text
         this.rawText = rawText
-        this.row = row
-        this.column = column
+        this.cursorPosition = TextCoordinate(textCoordinate.row, textCoordinate.column)
 
         highlightBrackets = brackets
         revalidate()
@@ -37,13 +45,13 @@ class TextFieldComponent : JComponent() {
     }
 
     fun addChar(ch: Char) {
-        val tokenizedRow = getTokenizedRow(row)
+        val tokenizedRow = getTokenizedRow(cursorPosition.row)
         val tokenInsertion = getTokenToInsert(tokenizedRow)
 
         val builder = StringBuilder(tokenInsertion.first.text)
         builder.insert(tokenInsertion.second, ch)
         tokenInsertion.first.text = builder.toString()
-        this.column++
+        cursorPosition.column++
         repaint()
     }
 
@@ -52,12 +60,12 @@ class TextFieldComponent : JComponent() {
         var current = 0
         for ((tokenIdx, token) in tokenizedRow.withIndex()) {
             var charIdx = 0
-            while (current < column && charIdx < token.text.length) {
+            while (current < cursorPosition.column && charIdx < token.text.length) {
                 current++
                 charIdx++
             }
 
-            if (current == column && token.kind != TokenKinds.END_LINE) {
+            if (current == cursorPosition.column && token.kind != TokenKinds.END_LINE) {
                 return Pair(tokenizedRow[tokenIdx], charIdx)
             }
         }
@@ -71,21 +79,20 @@ class TextFieldComponent : JComponent() {
     private fun insertToken(token: Token) {
         var idx = 0
         var currentRow = 0
-        while (currentRow < row) {
+        while (currentRow < cursorPosition.row) {
             if (tokenizedText[idx].kind == TokenKinds.END_LINE)
                 currentRow++
 
             idx++
         }
 
-        idx += column
+        idx += cursorPosition.column
         tokenizedText.add(idx, token)
     }
 
-    fun setSelect(selectCoordinates: SelectCoordinates, cursorRow: Int, cursorColumn: Int) {
+    fun setSelect(selectCoordinates: SelectCoordinates, textCoordinate: TextCoordinate) {
         this.selectCoordinates = selectCoordinates
-        column = cursorRow
-        row = cursorColumn
+        cursorPosition = TextCoordinate(textCoordinate.row, textCoordinate.column)
 
         revalidate()
         repaint()
@@ -113,7 +120,7 @@ class TextFieldComponent : JComponent() {
         g!!.drawBackground(editorLeftMargin, editorTopMargin, width - 4, height -4)
 
         val fontSize = Configuration.fontSize
-        val charSize = g.setMonospaceFont(fontSize)
+        charWidth = g.setMonospaceFont(fontSize)
 
         var current = fontSize
         for ((i, line) in rawText.withIndex()) {
@@ -123,7 +130,7 @@ class TextFieldComponent : JComponent() {
                 selectCoordinates.start.column,
                 selectCoordinates.end.row,
                 selectCoordinates.end.column,
-                charSize,
+                charWidth,
                 line.length,
                 lineHeight,
                 textLeftMargin,
@@ -134,16 +141,16 @@ class TextFieldComponent : JComponent() {
                 getTokenizedRow(i),
                 textLeftMargin,
                 current,
-                charSize
+                charWidth
             )
 
             current += lineHeight
 
             g.drawCursor(
                 i,
-                row,
-                column,
-                charSize,
+                cursorPosition.row,
+                cursorPosition.column,
+                charWidth,
                 fontSize,
                 lineHeight,
                 textLeftMargin,
@@ -151,10 +158,10 @@ class TextFieldComponent : JComponent() {
             )
 
             g.drawHighlightedBracket(
-                row,
-                column,
+                cursorPosition.row,
+                cursorPosition.column,
                 highlightBrackets,
-                charSize,
+                charWidth,
                 fontSize,
                 lineHeight,
                 textLeftMargin,

@@ -9,8 +9,10 @@ import events.EventProducer
 import tokenizer.Token
 import utils.InputTimer
 import utils.getBracketCoordinates
+import java.awt.Event.UP
 import java.awt.event.*
 import javax.swing.JFrame
+import javax.swing.SwingUtilities
 
 class TextFieldView(
     viewRepository: ViewRepository,
@@ -21,6 +23,7 @@ class TextFieldView(
     private val onHeightChangedEvent: Event<OnResizedCallback> = Event()
     private val onControlKeyPressedEvent: Event<OnControlKeyPressed> = Event()
     private val onTextChangedEvent: Event<OnTextChanged> = Event()
+    private val onCursorChangedEvent: Event<OnCursorChanged> = Event()
 
     private var inputTimer: InputTimer? = null
 
@@ -72,6 +75,18 @@ class TextFieldView(
 
                     for (s in onControlKeyPressedEvent.getSubscribers()) {
                         s.handle(key, e.isShiftDown, e.isControlDown)
+                    }
+                }
+            }
+        })
+
+        textField.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent?) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    val row = e!!.y / textField.lineHeight
+                    val column = (e.x / textField.charWidth) - 1
+                    for (s in onCursorChangedEvent.getSubscribers()) {
+                        s.update(TextCoordinate(row, column))
                     }
                 }
             }
@@ -150,9 +165,25 @@ class TextFieldView(
         }
     }
 
-    fun setTokenizedText(text: MutableList<Token>, rawText: MutableList<String>, row: Int, column: Int) {
-        val bracketCoordinates = getBracketCoordinates(rawText, row, column)
-        textField.setText(text, rawText, row, column, bracketCoordinates)
+    fun interface OnCursorChanged {
+        fun update(textCoordinate: TextCoordinate)
+    }
+
+    fun asOnCursorChangedEventProducer(): EventProducer<OnCursorChanged> {
+        return object : EventProducer<OnCursorChanged> {
+            override fun subscribe(who: Any, callback: OnCursorChanged) {
+                onCursorChangedEvent.subscribe(who, callback)
+            }
+
+            override fun unsubscribe(who: Any) {
+                onCursorChangedEvent.unsubscribe(who)
+            }
+        }
+    }
+
+    fun setTokenizedText(text: MutableList<Token>, rawText: MutableList<String>, textCoordinate: TextCoordinate) {
+        val bracketCoordinates = getBracketCoordinates(rawText, textCoordinate)
+        textField.setText(text, rawText, textCoordinate, bracketCoordinates)
     }
 
     private fun handleChar(ch: Char) {
@@ -168,7 +199,7 @@ class TextFieldView(
         textField.addChar(ch)
     }
 
-    fun setSelect(selectCoordinates: SelectCoordinates, row: Int, column: Int) {
-        textField.setSelect(selectCoordinates, row, column)
+    fun setSelect(selectCoordinates: SelectCoordinates, textCoordinate: TextCoordinate) {
+        textField.setSelect(selectCoordinates, textCoordinate)
     }
 }
