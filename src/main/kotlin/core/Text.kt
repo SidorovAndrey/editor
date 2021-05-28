@@ -101,6 +101,7 @@ class Text(textBuffer: BufferedReader) {
             prev.next!!.prev = prev
 
         totalLines--
+        lineIndex--
         return updateCurrentLine(prev)
     }
 
@@ -165,7 +166,6 @@ class Text(textBuffer: BufferedReader) {
         removeLine()
         val mergePosition = currentLineText.length
         addText(restText, currentLineText.length)
-        lineIndex--
 
         return mergePosition
     }

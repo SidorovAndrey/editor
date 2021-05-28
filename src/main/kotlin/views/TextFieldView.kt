@@ -10,6 +10,7 @@ import tokenizer.Token
 import utils.InputTimer
 import utils.getBracketCoordinates
 import java.awt.Event.UP
+import java.awt.Point
 import java.awt.event.*
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
@@ -24,8 +25,11 @@ class TextFieldView(
     private val onControlKeyPressedEvent: Event<OnControlKeyPressed> = Event()
     private val onTextChangedEvent: Event<OnTextChanged> = Event()
     private val onCursorChangedEvent: Event<OnCursorChanged> = Event()
+    private val onCursorDraggedEvent: Event<OnCursorDragged> = Event()
 
     private var inputTimer: InputTimer? = null
+
+    private var mousePressedPoint: Point? = null
 
     var currentHeight: Int = textField.height
         private set
@@ -87,6 +91,33 @@ class TextFieldView(
                     val column = (e.x / textField.charWidth) - 1
                     for (s in onCursorChangedEvent.getSubscribers()) {
                         s.update(TextCoordinate(row, column))
+                    }
+                }
+            }
+
+            override fun mousePressed(e: MouseEvent?) {
+                if (SwingUtilities.isLeftMouseButton(e) && mousePressedPoint == null) {
+                    mousePressedPoint = e!!.point
+                }
+            }
+
+            override fun mouseReleased(e: MouseEvent?) {
+                if (SwingUtilities.isLeftMouseButton(e) && mousePressedPoint != null) {
+                    mousePressedPoint = null
+                }
+            }
+        })
+
+        textField.addMouseMotionListener(object : MouseMotionAdapter() {
+            override fun mouseDragged(e: MouseEvent?) {
+                val originPoint = mousePressedPoint
+                if (SwingUtilities.isLeftMouseButton(e) && originPoint != null) {
+                    val originRow = originPoint.y / textField.lineHeight
+                    val originColumn = (originPoint.x / textField.charWidth) - 1
+                    val row = e!!.y / textField.lineHeight
+                    val column = (e.x / textField.charWidth) - 1
+                    for (s in onCursorDraggedEvent.getSubscribers()) {
+                        s.update(TextCoordinate(originRow, originColumn), TextCoordinate(row, column))
                     }
                 }
             }
@@ -177,6 +208,22 @@ class TextFieldView(
 
             override fun unsubscribe(who: Any) {
                 onCursorChangedEvent.unsubscribe(who)
+            }
+        }
+    }
+
+    fun interface OnCursorDragged {
+        fun update(origin: TextCoordinate, current: TextCoordinate)
+    }
+
+    fun asOnCursorDraggedEventProducer(): EventProducer<OnCursorDragged> {
+        return object : EventProducer<OnCursorDragged> {
+            override fun subscribe(who: Any, callback: OnCursorDragged) {
+                onCursorDraggedEvent.subscribe(who, callback)
+            }
+
+            override fun unsubscribe(who: Any) {
+                onCursorDraggedEvent.unsubscribe(who)
             }
         }
     }

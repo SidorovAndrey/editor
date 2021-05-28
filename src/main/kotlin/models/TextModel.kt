@@ -120,10 +120,11 @@ class TextModel(private var text: Text) {
         cursorColumn = 0
     }
 
-    fun startSelect() {
+    fun startSelect(origin: TextCoordinate? = null) {
         isSelecting = true
-        selectCoordinates = SelectCoordinates(TextCoordinate(cursorRow, cursorColumn), TextCoordinate(cursorRow, cursorColumn))
-        selectInitialCoordinates = TextCoordinate(cursorRow, cursorColumn)
+        val initial = if (origin != null) TextCoordinate(origin.row, origin.column) else TextCoordinate(cursorRow, cursorColumn)
+        selectCoordinates = SelectCoordinates(TextCoordinate(initial.row, initial.column), TextCoordinate(initial.row, initial.column))
+        selectInitialCoordinates = TextCoordinate(initial.row, initial.column)
     }
 
     fun stopSelect() {
@@ -254,8 +255,6 @@ class TextModel(private var text: Text) {
 
             text.deleteText(0, selectCoordinates.end.column)
             cursorColumn = text.mergeCurrentLineWithPrevious()
-
-            stopSelect()
         }
     }
 
@@ -267,5 +266,16 @@ class TextModel(private var text: Text) {
             else
                 text.currentLineText.length
 
+    }
+
+    fun setSelectCoordinates(origin: TextCoordinate, current: TextCoordinate) {
+        startSelect(origin)
+        cursorColumn =
+            if (current.column < text.currentLineText.length)
+                current.column
+            else
+                text.currentLineText.length
+
+        moveSelectRow(current.row - text.lineIndex)
     }
 }
