@@ -13,9 +13,9 @@ import java.awt.event.MouseEvent
 import javax.swing.JComponent
 
 class TextFieldComponent : JComponent() {
-    private val editorLeftMargin = 2;
-    private val editorTopMargin = 2;
-    private val textLeftMargin = editorLeftMargin + 10
+    private val editorLeftMargin = Configuration.editorLeftMargin
+    private val editorTopMargin = Configuration.editorTopMargin
+    private val textLeftMargin = editorLeftMargin + Configuration.textLeftMargin
 
     private var cursorPosition = TextCoordinate(0, 0)
     private var rawText: MutableList<String> = mutableListOf()

@@ -5,6 +5,9 @@ import java.util.*
 object Configuration {
     private const val fontSizeKey = "font_size"
     private const val linesGapKey = "lines_gap"
+    private const val editorLeftMarginKey = "editor_left_margin"
+    private const val editorTopMarginKey = "editor_top_margin"
+    private const val textLeftMarginKey = "text_left_margin"
 
     private const val bgColorKey = "bg_color"
     private const val cursorColorKey = "cursor_color"
@@ -20,6 +23,15 @@ object Configuration {
         private set
 
     var linesGap: Int = 0
+        private set
+
+    var editorLeftMargin: Int = 0
+        private set
+
+    var editorTopMargin: Int = 0
+        private set
+
+    var textLeftMargin: Int = 0
         private set
 
     var bgColor: Color = Color(0, 0, 0)
@@ -55,6 +67,9 @@ object Configuration {
 
         fontSize = Integer.parseInt(props.getProperty(fontSizeKey))
         linesGap = Integer.parseInt(props.getProperty(linesGapKey))
+        editorLeftMargin = Integer.parseInt(props.getProperty(editorLeftMarginKey))
+        editorTopMargin = Integer.parseInt(props.getProperty(editorTopMarginKey))
+        textLeftMargin = Integer.parseInt(props.getProperty(textLeftMarginKey))
 
         bgColor = readColor(bgColorKey, props)
         cursorColor = readColor(cursorColorKey, props)

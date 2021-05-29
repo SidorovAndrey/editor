@@ -23,7 +23,7 @@ fun getBracketCoordinates(text: MutableList<String>, textCoordinate: TextCoordin
             if (i >= text[rowIdx].length) {
                 i = 0
                 rowIdx++
-                while (text[rowIdx].isEmpty()) rowIdx++
+                while (rowIdx < text.size && text[rowIdx].isEmpty()) rowIdx++
             }
 
             if (rowIdx == text.size) {

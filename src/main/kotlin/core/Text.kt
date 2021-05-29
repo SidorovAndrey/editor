@@ -13,21 +13,8 @@ class Text(textBuffer: BufferedReader) {
     var totalLines: Int
         private set
 
-    var currentLineText: String
+    val currentLineText: String
         get() = currentLine.text
-        set(value) {
-            val prev = currentLine.prev
-            val next = currentLine.next
-            val newLine = TextLine(value)
-            if (prev != null) {
-                newLine.prev = prev
-                prev.next = newLine
-            }
-            if (next != null) {
-                newLine.next = next
-                next.prev = newLine
-            }
-        }
 
     init {
         head = TextLine(textBuffer.readLine() ?: "")
@@ -41,11 +28,6 @@ class Text(textBuffer: BufferedReader) {
             current = current.next!!
             totalLines++
         }
-    }
-
-    private fun updateCurrentLine(current: TextLine): String {
-        currentLine = current
-        return currentLine.text
     }
 
     fun move(offset: Int): String {
@@ -145,7 +127,6 @@ class Text(textBuffer: BufferedReader) {
         val currentLine = currentLine
         val builder = StringBuilder(currentLine.text)
 
-        // TODO: use exceptions? handle rows here?
         if (elements < 0 && pos + elements >= 0) {
             builder.deleteRange(pos + elements, pos)
         } else if (elements > 0 && pos + elements <= currentLineText.length) {
@@ -156,9 +137,6 @@ class Text(textBuffer: BufferedReader) {
         replaceLine(currentLine, newLine)
     }
 
-    /**
-     * Merges current line with previous. Returns position where text was merged
-     */
     fun mergeCurrentLineWithPrevious(): Int {
         if (lineIndex == 0) return 0
 
@@ -168,6 +146,11 @@ class Text(textBuffer: BufferedReader) {
         addText(restText, currentLineText.length)
 
         return mergePosition
+    }
+
+    private fun updateCurrentLine(current: TextLine): String {
+        currentLine = current
+        return currentLine.text
     }
 
     private fun replaceLine(current: TextLine, newLine: TextLine) {

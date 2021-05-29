@@ -23,8 +23,7 @@ class TextModel(private var text: Text) {
         private set
 
     val cursorRow: Int
-        get() = text.lineIndex
-
+        get() = text.lineIndex - firstRow
 
     var isSelecting: Boolean = false
         private set
@@ -49,19 +48,34 @@ class TextModel(private var text: Text) {
     }
 
     fun resize(size: Int) {
-        lastRow = firstRow + size
+        lastRow = if (size < 2)
+            firstRow + 1
+        else
+            firstRow + size
     }
 
     fun moveCursorUp() {
         text.move(-1)
         if (text.currentLineText.length < cursorColumn)
             cursorColumn = text.currentLineText.length
+
+        if (text.lineIndex < firstRow) {
+            val size = lastRow - firstRow
+            firstRow = text.lineIndex
+            lastRow = firstRow + size
+        }
     }
 
     fun moveCursorDown() {
         text.move(1)
         if (text.currentLineText.length < cursorColumn)
             cursorColumn = text.currentLineText.length
+
+        if (text.lineIndex > lastRow) {
+            val size = lastRow - firstRow
+            lastRow = text.lineIndex
+            firstRow = lastRow - size
+        }
     }
 
     fun moveCursorRight() {
@@ -79,12 +93,20 @@ class TextModel(private var text: Text) {
         text.move(-text.lineIndex)
         if (cursorColumn > text.currentLineText.length)
             cursorColumn = text.currentLineText.length
+
+        val size = lastRow - firstRow
+        firstRow = text.lineIndex
+        lastRow = firstRow + size
     }
 
     fun moveCursorToLastLine() {
         text.move(text.totalLines - text.lineIndex)
         if (cursorColumn > text.currentLineText.length)
             cursorColumn = text.currentLineText.length
+
+        val size = lastRow - firstRow
+        lastRow = text.lineIndex
+        firstRow = lastRow - size
     }
 
     fun moveCursorToLineBegin() {

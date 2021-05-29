@@ -42,7 +42,7 @@ class TextFieldView(
                 if (currentHeight != e!!.component.height && e.component.height > 1) {
                     currentHeight = e.component.height
                     for (c in onHeightChangedEvent.getSubscribers()) {
-                        c.set(currentHeight / textField.lineHeight)
+                        c.set((currentHeight / textField.lineHeight) - 1)
                     }
                 }
             }

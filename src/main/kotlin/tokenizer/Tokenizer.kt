@@ -13,19 +13,14 @@ class Tokenizer(private val text: Text) {
         "synchronized", "this", "throw", "throws", "transient", "true",
         "try", "void", "volatile", "while")
 
-    var state: TokenKinds = TokenKinds.NOTHING
-        private set
-
-    var linesState: MutableList<TokenKinds> = mutableListOf()
-        private set
+    private var state: TokenKinds = TokenKinds.NOTHING
 
     init {
-        val lines = text.getRange(1, text.totalLines)
+        val lines = text.getRange(0, text.totalLines)
         for (line in lines) {
             val tokenized = tokenizeLine(line)
             if (tokenized.any()) {
                 val lineState = tokenizeLine(line).last().kind
-                linesState.add(lineState)
                 state = lineState
             }
         }
@@ -86,6 +81,7 @@ class Tokenizer(private val text: Text) {
     }
 
     fun getRange(start: Int, end: Int): MutableList<Token> {
+        state = TokenKinds.NOTHING
         val lines = text.getRange(start, end)
         val res = mutableListOf<Token>()
         for (line in lines) {
