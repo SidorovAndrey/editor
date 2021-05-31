@@ -2,6 +2,9 @@ package components
 
 import SelectCoordinates
 import TextCoordinate
+import textCoordinateCopy
+import textCoordinateDefault
+import textCoordinateNegative
 import tokenizer.Token
 import tokenizer.TokenKinds
 import utils.*
@@ -17,13 +20,13 @@ class TextFieldComponent : JComponent() {
     private val editorTopMargin = Configuration.editorTopMargin
     private val textLeftMargin = editorLeftMargin + Configuration.textLeftMargin
 
-    private var cursorPosition = TextCoordinate(0, 0)
+    private var cursorPosition = textCoordinateDefault()
     private var rawText: MutableList<String> = mutableListOf()
     private var tokenizedText: MutableList<Token> = mutableListOf()
 
-    private var selectCoordinates = SelectCoordinates(TextCoordinate(0, 0), TextCoordinate(0, 0))
+    private var selectCoordinates = SelectCoordinates(textCoordinateDefault(), textCoordinateDefault())
 
-    private var highlightBrackets = Pair(TextCoordinate(-1, -1), TextCoordinate(-1, -1))
+    private var highlightBrackets = Pair(textCoordinateNegative(), textCoordinateNegative())
 
     val lineHeight = Configuration.fontSize + Configuration.linesGap
     var charWidth: Int = 0
@@ -92,7 +95,7 @@ class TextFieldComponent : JComponent() {
 
     fun setSelect(selectCoordinates: SelectCoordinates, textCoordinate: TextCoordinate) {
         this.selectCoordinates = selectCoordinates
-        cursorPosition = TextCoordinate(textCoordinate.row, textCoordinate.column)
+        cursorPosition = textCoordinateCopy(textCoordinate)
 
         revalidate()
         repaint()

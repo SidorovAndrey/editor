@@ -3,6 +3,8 @@ package models
 import SelectCoordinates
 import TextCoordinate
 import core.Text
+import textCoordinateCopy
+import textCoordinateDefault
 import tokenizer.Token
 import tokenizer.Tokenizer
 import java.awt.Toolkit
@@ -28,8 +30,8 @@ class TextModel(private var text: Text) {
     var isSelecting: Boolean = false
         private set
 
-    var selectInitialCoordinates = TextCoordinate(0, 0)
-    var selectCoordinates = SelectCoordinates(TextCoordinate(0, 0), TextCoordinate(0, 0))
+    var selectInitialCoordinates = textCoordinateDefault()
+    var selectCoordinates = SelectCoordinates(textCoordinateDefault(), textCoordinateDefault())
 
     fun loadText(bufferedReader: BufferedReader) {
         text = Text(bufferedReader)
@@ -144,15 +146,15 @@ class TextModel(private var text: Text) {
 
     fun startSelect(origin: TextCoordinate? = null) {
         isSelecting = true
-        val initial = if (origin != null) TextCoordinate(origin.row, origin.column) else TextCoordinate(cursorRow, cursorColumn)
-        selectCoordinates = SelectCoordinates(TextCoordinate(initial.row, initial.column), TextCoordinate(initial.row, initial.column))
-        selectInitialCoordinates = TextCoordinate(initial.row, initial.column)
+        val initial = if (origin != null) textCoordinateCopy(origin) else TextCoordinate(cursorRow, cursorColumn)
+        selectCoordinates = SelectCoordinates(textCoordinateCopy(initial), textCoordinateCopy(initial))
+        selectInitialCoordinates = textCoordinateCopy(initial)
     }
 
     fun stopSelect() {
         isSelecting = false
-        selectCoordinates = SelectCoordinates(TextCoordinate(0, 0), TextCoordinate(0, 0))
-        selectInitialCoordinates = TextCoordinate(0, 0)
+        selectCoordinates = SelectCoordinates(textCoordinateDefault(), textCoordinateDefault())
+        selectInitialCoordinates = textCoordinateDefault()
     }
 
     fun moveSelectColumn(offset: Int) {

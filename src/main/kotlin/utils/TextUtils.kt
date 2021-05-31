@@ -1,17 +1,18 @@
 package utils
 
 import TextCoordinate
+import textCoordinateNegative
 import java.security.InvalidParameterException
 
 fun getBracketCoordinates(text: MutableList<String>, textCoordinate: TextCoordinate): Pair<TextCoordinate, TextCoordinate> {
     val row = text[textCoordinate.row]
     if (row.isEmpty() || textCoordinate.column >= row.length)
-        return Pair(TextCoordinate(-1, -1), TextCoordinate(-1, -1))
+        return Pair(textCoordinateNegative(), textCoordinateNegative())
 
     val bracket =  row[textCoordinate.column]
     val bracketTest = isBracket(bracket)
 
-    // go to right
+    // go right
     if (bracketTest == 1) {
         val bracketPair = getBracketPair(bracket)
 
@@ -28,7 +29,7 @@ fun getBracketCoordinates(text: MutableList<String>, textCoordinate: TextCoordin
 
             if (rowIdx == text.size) {
                 // not found, return empty pair
-                return Pair(TextCoordinate(-1, -1), TextCoordinate(-1, -1))
+                return Pair(textCoordinateNegative(), textCoordinateNegative())
             } else {
                 if (text[rowIdx][i] == bracket)
                     brackets++
@@ -40,7 +41,7 @@ fun getBracketCoordinates(text: MutableList<String>, textCoordinate: TextCoordin
         return Pair(TextCoordinate(textCoordinate.row, textCoordinate.column), TextCoordinate(rowIdx, i))
     }
 
-    // go to left
+    // go left
     if (bracketTest == -1) {
         val bracketPair = getBracketPair(bracket)
 
@@ -53,7 +54,7 @@ fun getBracketCoordinates(text: MutableList<String>, textCoordinate: TextCoordin
                 rowIdx--
                 if (rowIdx < 0) {
                     // not found, return empty pair
-                    return Pair(TextCoordinate(-1, -1), TextCoordinate(-1, -1))
+                    return Pair(textCoordinateNegative(), textCoordinateNegative())
                 }
 
                 i = text[rowIdx].length
@@ -69,7 +70,7 @@ fun getBracketCoordinates(text: MutableList<String>, textCoordinate: TextCoordin
     }
 
     // it is not a bracket
-    return Pair(TextCoordinate(-1, -1), TextCoordinate(-1, -1))
+    return Pair(textCoordinateNegative(), textCoordinateNegative())
 }
 
 private val openBrackets = setOf('(', '[', '{', '<')
